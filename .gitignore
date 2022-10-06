@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /SplitBackDotnet/mydatabase.db
 /SplitBackDotnet/appsettings.Development.json
+/SplitBackDotnet/mydatabase.db-shm
+/SplitBackDotnet/mydatabase.db-wal
