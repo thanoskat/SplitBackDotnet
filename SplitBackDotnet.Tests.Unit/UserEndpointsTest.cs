@@ -5,13 +5,13 @@ using SplitBackDotnet.Dtos;
 using UnitTests.Helpers;
 using AutoMapper;
 
-namespace SplitBackDotnet.Tests.Unit; 
+namespace SplitBackDotnet.Tests.Unit;
 
 public class UserEndpointsTest {
 
   [Fact]
   public async Task GetUsers_ShouldReturnUsers() {
-    
+
     //Arrange
     await using var context = new MockDb().CreateDbContext();
     context.Add(new User {
@@ -22,7 +22,7 @@ public class UserEndpointsTest {
 
     //Act
     var result = await UserEndpoints.GetUsers(context);
-    
+
     //Assert
     Assert.IsType<Ok<List<User>>>(result);
   }
