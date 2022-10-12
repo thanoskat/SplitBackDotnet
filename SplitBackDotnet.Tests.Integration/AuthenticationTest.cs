@@ -3,6 +3,7 @@ using SplitBackDotnet.Tests.Integration.Mocks;
 using System.Net.Http.Json;
 using SplitBackDotnet.Helper;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace SplitBackDotnet.Tests.Integration;
 
@@ -24,15 +25,15 @@ public class AuthenticationTest : IClassFixture<TestWebApplicationFactory<Progra
   [Fact]
   public async Task SignUp_Test() {
     
-    var response1 = await _httpClient.PostAsJsonAsync("/auth/request-sign-up", newUser);
+    var requestSignUpResponse = await _httpClient.PostAsJsonAsync("/auth/request-sign-up", newUser);
     //response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string>? value);
-    var stringInResponse = await response1.Content.ReadAsStringAsync();
-    var tokenInEmail = stringInResponse.Remove(stringInResponse.Length - 1, 1).Remove(0, 1);
+    var stringInResponse = await requestSignUpResponse.Content.ReadAsStringAsync();
+    var tokenInEmail = JsonConvert.DeserializeObject<string>(stringInResponse);
 
     await _httpClient.PostAsJsonAsync("/auth/verify-token", new TokenBody { Token = tokenInEmail });
 
-    var response2 = await _httpClient.PostAsync("/auth/sign-in", null);
-    
-    Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+    var signInResponse = await _httpClient.PostAsync("/auth/sign-in", null);
+
+    Assert.Equal(HttpStatusCode.OK, signInResponse.StatusCode);
   }
 }

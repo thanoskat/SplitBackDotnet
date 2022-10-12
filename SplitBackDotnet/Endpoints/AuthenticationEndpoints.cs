@@ -248,9 +248,9 @@ public static class AuthenticationEndpoints {
   }
 
   public static IResult RequestSignUp(HttpResponse response, IMapper mapper, IConfiguration config, DataContext context, UserCreateDto userCreateDto) {
-    //if(context.Users.Any(_user => _user.Email == userCreateDto.Email)) {
-    //  return Results.Ok("User already exists!");
-    //}
+    if(context.Users.Any(_user => _user.Email == userCreateDto.Email)) {
+      return Results.Ok("User already exists!");
+    }
 
     var unique = Guid.NewGuid().ToString();
 
@@ -283,6 +283,7 @@ public static class AuthenticationEndpoints {
       MaxAge = TimeSpan.FromDays(30)
     });
     Console.WriteLine($"Sign up verification link with to {userCreateDto.Email}. {jwtToken}");
-    return Results.Ok(jwtToken);
+    return Results.Ok(jwtToken); //Adding quotes around string
+    //return Results.Text(jwtToken); //Doesnt add quotes around string
   }
 }
