@@ -19,10 +19,6 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
       services.AddDbContext<DataContext>(options => {
         options.UseInMemoryDatabase($"InMemoryMockDb");
       });
-      //services.AddDbContext<DataContext>(options => {
-      //  var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-      //  options.UseSqlite($"Data Source={Path.Join(path, "SplitBackDotnet_Tests_Integration.db")}");
-      //});
     });
 
     return base.CreateHost(builder);

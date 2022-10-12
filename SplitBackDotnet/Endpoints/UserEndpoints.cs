@@ -44,7 +44,7 @@ public static class UserEndpoints {
 
 
   public static async Task<IResult> GetUsers(DataContext context) {
-    // return TypedResults.BadRequest("lala");
+    // return TypedResults.BadRequest("bad request");
     return TypedResults.Ok(await context.Users.Include(user => user.CreatedGroups).ToListAsync());
   }
 

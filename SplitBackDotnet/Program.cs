@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using SplitBackDotnet.Data;
 using SplitBackDotnet.Endpoints;
-using SplitBackDotnet.Models;
 using SplitBackDotnet.Services;
 using SplitBackDotnet.Profiles;
 using System.Text.Json.Serialization;
