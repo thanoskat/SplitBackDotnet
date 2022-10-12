@@ -53,7 +53,7 @@ public static class UserEndpoints {
     var newUser = mapper.Map<User>(userCreateDto);
     context.Users.Add(newUser);
     await context.SaveChangesAsync();
-    return TypedResults.Ok(await context.Users.ToArrayAsync());
+    return TypedResults.Ok(await context.Users.ToListAsync());
   }
 
 }
