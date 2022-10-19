@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SplitBackDotnet.Data;
 
@@ -10,9 +11,11 @@ using SplitBackDotnet.Data;
 namespace SplitBackDotnet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221017182820_mig5")]
+    partial class mig5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0-rc.1.22426.7");
@@ -62,18 +65,28 @@ namespace SplitBackDotnet.Migrations
 
             modelBuilder.Entity("SplitBackDotnet.Models.ExpenseUser", b =>
                 {
+                    b.Property<int>("ExpensesId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SpendersId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ExpenseId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("SpenderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("SpenderAmount")
+                    b.Property<decimal>("spenderAmount")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("ExpenseId", "SpenderId");
+                    b.HasKey("ExpensesId", "SpendersId");
+
+                    b.HasIndex("ExpenseId");
 
                     b.HasIndex("SpenderId");
+
+                    b.HasIndex("SpendersId");
 
                     b.ToTable("ExpenseUser");
                 });
@@ -250,14 +263,26 @@ namespace SplitBackDotnet.Migrations
             modelBuilder.Entity("SplitBackDotnet.Models.ExpenseUser", b =>
                 {
                     b.HasOne("SplitBackDotnet.Models.Expense", "Expense")
-                        .WithMany("ExpenseUsers")
+                        .WithMany()
                         .HasForeignKey("ExpenseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SplitBackDotnet.Models.Expense", null)
+                        .WithMany()
+                        .HasForeignKey("ExpensesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SplitBackDotnet.Models.User", "Spender")
-                        .WithMany("ExpenseUsers")
+                        .WithMany()
                         .HasForeignKey("SpenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SplitBackDotnet.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("SpendersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -335,8 +360,6 @@ namespace SplitBackDotnet.Migrations
 
             modelBuilder.Entity("SplitBackDotnet.Models.Expense", b =>
                 {
-                    b.Navigation("ExpenseUsers");
-
                     b.Navigation("Shares");
                 });
 
@@ -352,8 +375,6 @@ namespace SplitBackDotnet.Migrations
             modelBuilder.Entity("SplitBackDotnet.Models.User", b =>
                 {
                     b.Navigation("CreatedGroups");
-
-                    b.Navigation("ExpenseUsers");
                 });
 #pragma warning restore 612, 618
         }
