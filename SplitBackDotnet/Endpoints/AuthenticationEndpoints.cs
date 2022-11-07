@@ -28,7 +28,6 @@ public static class AuthenticationEndpoints {
           // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
           ClockSkew = TimeSpan.Zero
         }, out SecurityToken validatedToken);
-
         var validatedJwtToken = (JwtSecurityToken)validatedToken;
         var type = validatedJwtToken.Payload.Claims.First(claim => claim.Type == "type").Value;
         var unique = validatedJwtToken.Payload.Claims.First(claim => claim.Type == "unique").Value;

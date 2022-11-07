@@ -19,12 +19,13 @@ public static class AuthenticationExtension {
         ValidAudience = config["Jwt:Audience"],
         ValidateAudience = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
-        ValidateLifetime = true, // In any other application other then demo this needs to be true,
+        ValidateLifetime = true, // In any other application other then dem o this needs to be true,
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero
       };
     });
     Console.WriteLine(config["Jwt:Key"]);
     services.AddAuthentication();
+    services.AddAuthorization();
   }
 }

@@ -4,7 +4,8 @@ using SplitBackDotnet.Models;
 using SplitBackDotnet.Dtos;
 using AutoMapper;
 using SplitBackDotnet.Helper;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 namespace SplitBackDotnet.Endpoints;
 
 public static class ExpenseEndpoints {
@@ -24,21 +25,13 @@ public static class ExpenseEndpoints {
       Console.WriteLine(x);
     });
 
-    app.MapPost("/creategroup", async (IRepo repo, IMapper mapper, DataContext context, CreateGroupDto createGroupDto) => {
+    app.MapPost("/creategroup", [Authorize] async (HttpContext httpContext,IRepo repo, IMapper mapper, DataContext context, CreateGroupDto createGroupDto) => {
+      
       var group = mapper.Map<Group>(createGroupDto);
-      User creator = new User();
-      creator.Id=7;
-      creator.Email="paok@gmail.com";
-      creator.Nickname="Mpelos";
-      Console.WriteLine(creator.Id);
-      AddCreatorAsMember.AddCreatorToMembers(creator,group);
-      Console.Write("Hello");
-
-      //bool userFound = new UserLookup(context).UserFound(userr, group);
+      PreGroupSetUp.AddCreatorToMembers(context,httpContext,group);
       await repo.CreateGroup(group);
       await repo.SaveChangesAsync();
-      // await context.Groups.AddAsync(group);
-      // await context.SaveChangesAsync();
+
     });
   }
 }
