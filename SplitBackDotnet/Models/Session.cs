@@ -1,8 +1,11 @@
 ﻿namespace SplitBackDotnet.Models; 
+using System.ComponentModel.DataAnnotations;
 
 public class Session {
-  public int Id { get; set; }
-  public string RefreshToken { get; set; } = null!;
-  public User User { get; set; } = null!;
+  public int SessionId { get; set; }
+  [Required]
+  public string RefreshToken { get; set; } =String.Empty;
+  [Required]
+  public User User { get; set; } = new User();
   public string? Unique { get; set; }  
 }

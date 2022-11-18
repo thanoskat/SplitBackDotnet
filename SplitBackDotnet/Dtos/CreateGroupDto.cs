@@ -1,5 +1,4 @@
 using SplitBackDotnet.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace SplitBackDotnet.Dtos{
     public class CreateGroupDto{

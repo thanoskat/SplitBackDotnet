@@ -2,7 +2,9 @@
 
 public class Share
 {
-    public int Id { get; set; }
-    public User User { get; set; } = null!;
-    public decimal Amount { get; set; }
+  public int ParticipantId { get; set; }
+  public User Participant { get; set; } = null!;
+  public int ExpenseId { get; set; }
+  public Expense Expense { get; set; } = null!;
+  public decimal ParticipantAmount { get; set; }
 }

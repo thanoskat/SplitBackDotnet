@@ -113,7 +113,7 @@ public static class AuthenticationEndpoints {
 
       var tokenDescriptor = new SecurityTokenDescriptor {
         Subject = new ClaimsIdentity(new[] {
-          new Claim("userId", sessionFound.User.Id.ToString())
+          new Claim("userId", sessionFound.User.UserId.ToString())
         }),
         Expires = DateTime.Now.AddMinutes(1),
         Audience = config["Jwt:Audience"],
@@ -126,8 +126,8 @@ public static class AuthenticationEndpoints {
       return Results.Ok(new {
         accessToken = jwtTokenHandler.WriteToken(token),
         sessionData = new {
-          id = sessionFound.Id,
-          userId = userFound.Id,
+          id = sessionFound.SessionId,
+          userId = userFound.UserId,
           userEmail = userFound.Email,
           userNickname = userFound.Nickname
         }
@@ -226,7 +226,7 @@ public static class AuthenticationEndpoints {
 
       var tokenDescriptor = new SecurityTokenDescriptor {
         Subject = new ClaimsIdentity(new[] {
-          new Claim("userId", sessionFound.User.Id.ToString())
+          new Claim("userId", sessionFound.User.UserId.ToString())
         }),
         Expires = DateTime.Now.AddMinutes(1),
         Audience = config["Jwt:Audience"],
