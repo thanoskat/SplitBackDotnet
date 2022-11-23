@@ -12,8 +12,7 @@ public class User
   public string Email { get; set; } = String.Empty;
   public ICollection<Group>? Groups { get; set; } = new List<Group>();
   public ICollection<Group>? CreatedGroups { get; set; } = new List<Group>();
-  //public ICollection<Expense>? Expenses { get; set; } = new List<Expense>();
   [Required]
-  public ICollection<ExpenseUser> ExpenseUsers { get; set; } = new List<ExpenseUser>();
-  public ICollection<Share> Shares { get; set; } = new List<Share>();
+  public ICollection<ExpenseSpender> ExpenseSpenders { get; set; } = new List<ExpenseSpender>();
+  public ICollection<ExpenseParticipant> ExpenseParticipants { get; set; } = new List<ExpenseParticipant>();
 }

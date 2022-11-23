@@ -12,8 +12,8 @@ public class UserProfile : Profile
     CreateMap<UserCreateDto, User>();
     CreateMap<LabelDto, Label>();
     //CreateMap<UserShareDto, User>();
-    CreateMap<ShareDto, Share>();
-    CreateMap<ExpenseUsersDto, ExpenseUser>();
+    CreateMap<ExpenseParticipantDto, ExpenseParticipant>();
+    CreateMap<ExpenseSpenderDto, ExpenseSpender>();
     CreateMap<NewExpenseDto, Expense>();
     CreateMap<CreateGroupDto, Group>()
     .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => src.GroupLabels));

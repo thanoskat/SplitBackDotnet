@@ -37,14 +37,13 @@ public static class ExpenseEndpoints
       await repo.SaveChangesAsync();
     });
 
-
     app.MapPost("/addExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) =>
     {
       var newExpense = mapper.Map<Expense>(newExpenseDto);
-      var groupFound = await repo.GetGroupById(newExpenseDto.GroupId);
-      groupFound?.Expenses?.Add(newExpense);
+      var Group = await repo.GetGroupById(newExpenseDto.GroupId);
+      Group?.Expenses?.Add(newExpense);
       await repo.SaveChangesAsync();
-      //var result = CalcPending.PendingTransactions(groupFound.Expenses, groupFound.Transfers, groupFound.Members);
+      var result = CalcPending.PendingTransactions(Group.Expenses, Group.Transfers, Group.Members);
     });
   }
 }

@@ -1,6 +1,6 @@
 namespace SplitBackDotnet.Models;
 
-public class ExpenseUser
+public class ExpenseSpender
 {
   public int SpenderId { get; set; }
   public User Spender { get; set; } = null!;

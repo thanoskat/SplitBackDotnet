@@ -6,6 +6,6 @@ public class Transfer
     [MaxLength(100)]
     public string? Description { get; set; }
     public decimal Amount { get; set; }
-    public User Sender { get; set; } = null!;
-    public User Receiver { get; set; } = null!;
+    public int SenderId { get; set; }
+    public int ReceiverId { get; set; }
 }

@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 namespace SplitBackDotnet.Models;
 
 public class Group
@@ -14,5 +13,6 @@ public class Group
   public ICollection<User> Members { get; set; } = new List<User>();
   public ICollection<Expense>? Expenses { get; set; } = new List<Expense>();
   public ICollection<Transfer>? Transfers { get; set; } = new List<Transfer>();
-   public ICollection<Label>? Labels { get; set; } = new List<Label>();
+  public ICollection<Label>? Labels { get; set; } = new List<Label>();
+  public ICollection<PendingTransaction>? PendingTransactions { get; set; } = new List<PendingTransaction>();
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SplitBackDotnet.Data;
 
@@ -10,9 +11,11 @@ using SplitBackDotnet.Data;
 namespace SplitBackDotnet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221122171029_mig33")]
+    partial class mig33
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0-rc.1.22426.7");
@@ -209,9 +212,14 @@ namespace SplitBackDotnet.Migrations
                     b.Property<int>("SenderId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("TransferId");
 
                     b.HasIndex("GroupId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Transfers");
                 });
@@ -347,6 +355,10 @@ namespace SplitBackDotnet.Migrations
                     b.HasOne("SplitBackDotnet.Models.Group", null)
                         .WithMany("Transfers")
                         .HasForeignKey("GroupId");
+
+                    b.HasOne("SplitBackDotnet.Models.User", null)
+                        .WithMany("Transfers")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("SplitBackDotnet.Models.Expense", b =>
@@ -374,6 +386,8 @@ namespace SplitBackDotnet.Migrations
                     b.Navigation("ExpenseParticipants");
 
                     b.Navigation("ExpenseSpenders");
+
+                    b.Navigation("Transfers");
                 });
 #pragma warning restore 612, 618
         }

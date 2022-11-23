@@ -10,13 +10,10 @@ public int ExpenseId { get; set; }
 public string Description { get; set; } = String.Empty;
 [Required]
 public decimal Amount { get; set; }
-//[Required]
-//public ICollection<User> Spenders { get; set; } = new List<User>();
-//public ICollection<User> Participants { get; set; } = new List<User>();
 public Label? Label { get; set; }
 [Required]
-public ICollection<ExpenseUser> ExpenseUsers { get; set; } = new List<ExpenseUser>();
+public ICollection<ExpenseSpender> ExpenseSpenders { get; set; } = new List<ExpenseSpender>();
 [Required]
-public ICollection<Share> Shares { get; set; } = new List<Share>();
+public ICollection<ExpenseParticipant> ExpenseParticipants { get; set; } = new List<ExpenseParticipant>();
 
 }

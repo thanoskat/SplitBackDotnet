@@ -15,8 +15,8 @@ public class DataContext : DbContext
   public DbSet<User> Users { get; set; } = null!;
   public DbSet<Group> Groups { get; set; } = null!;
   public DbSet<Expense> Expenses { get; set; } = null!;
-  public DbSet<ExpenseUser> ExpenseUsers { get; set; } = null!;
-  public DbSet<Share> Shares { get; set; } = null!;
+  public DbSet<ExpenseSpender> ExpenseSpenders { get; set; } = null!;
+  public DbSet<ExpenseParticipant> ExpenseParticipants { get; set; } = null!;
   public DbSet<Transfer> Transfers { get; set; } = null!;
   public DbSet<Label> Labels { get; set; } = null!;
   public DbSet<Session> Sessions { get; set; } = null!;
@@ -26,30 +26,30 @@ public class DataContext : DbContext
     modelBuilder.Entity<User>().HasMany(user => user.Groups).WithMany(group => group.Members);
     modelBuilder.Entity<Group>().HasOne(group => group.Creator).WithMany(user => user.CreatedGroups);
 
-    //Start of ExpenseUser
+    //Start of ExpenseSpender
     //https://www.entityframeworktutorial.net/efcore/configure-many-to-many-relationship-in-ef-core.aspx
-    modelBuilder.Entity<ExpenseUser>().HasKey(eu => new { eu.ExpenseId, eu.SpenderId });
-    modelBuilder.Entity<ExpenseUser>()
+    modelBuilder.Entity<ExpenseSpender>().HasKey(eu => new { eu.ExpenseId, eu.SpenderId });
+    modelBuilder.Entity<ExpenseSpender>()
     .HasOne<Expense>(eu => eu.Expense)
-    .WithMany(e => e.ExpenseUsers)
+    .WithMany(e => e.ExpenseSpenders)
     .HasForeignKey(eu => eu.ExpenseId);
 
-    modelBuilder.Entity<ExpenseUser>()
+    modelBuilder.Entity<ExpenseSpender>()
     .HasOne<User>(eu => eu.Spender)
-    .WithMany(e => e.ExpenseUsers)
+    .WithMany(e => e.ExpenseSpenders)
     .HasForeignKey(eu => eu.SpenderId);
     //End of ExpenseUser
 
     //Start of Share
-    modelBuilder.Entity<Share>().HasKey(s => new { s.ExpenseId, s.ParticipantId });
-    modelBuilder.Entity<Share>()
+    modelBuilder.Entity<ExpenseParticipant>().HasKey(s => new { s.ExpenseId, s.ParticipantId });
+    modelBuilder.Entity<ExpenseParticipant>()
     .HasOne<Expense>(s => s.Expense)
-    .WithMany(e => e.Shares)
+    .WithMany(e => e.ExpenseParticipants)
     .HasForeignKey(s => s.ExpenseId);
 
-    modelBuilder.Entity<Share>()
+    modelBuilder.Entity<ExpenseParticipant>()
    .HasOne<User>(s => s.Participant)
-   .WithMany(p => p.Shares)
+   .WithMany(p => p.ExpenseParticipants)
    .HasForeignKey(s => s.ParticipantId);
     //End of Share
 
