@@ -1,6 +1,7 @@
 using SplitBackDotnet.Models;
-using System.Linq;
 using SplitBackDotnet.Data;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace SplitBackDotnet.Helper
 {
@@ -30,9 +31,9 @@ namespace SplitBackDotnet.Helper
 
   public class CalcPending
   {
-    public static List<PendingTransaction> PendingTransactions(ICollection<Expense> Expenses, ICollection<Transfer> Transfers, ICollection<User> Members)
+    public static async void PendingTransactions(ICollection<Expense> Expenses, ICollection<Transfer> Transfers, ICollection<User> Members, Group Group, IRepo repo, DataContext context)
     {
-      //List<Spender> Spenders1 = new List<Spender>(Members.Count);
+      // List<Spender> Spenders1 = new List<Spender>(Members.Count);
       // Separate spenders in debtors and creditors
       List<Debtor> Debtors = new List<Debtor>();
       List<Creditor> Creditors = new List<Creditor>();
@@ -57,12 +58,12 @@ namespace SplitBackDotnet.Helper
 
         for (int spndr = 0; spndr < Spenders.Length; spndr++)
         {
-          Spenders[spndr].MoneySummedAndDistributed = Expenses
+          Spenders[spndr].MoneySummedAndDistributed += Expenses
           .ElementAt(e)
           .ExpenseParticipants.Where(ep => ep.ParticipantId == Spenders[spndr].Id)
           .Sum(ep => ep.ContributionAmount);
 
-          Spenders[spndr].Balance = (-1) * Expenses
+          Spenders[spndr].Balance += (-1) * Expenses
           .ElementAt(e)
           .ExpenseSpenders.Where(es => es.SpenderId == Spenders[spndr].Id)
           .Sum(es => es.SpenderAmount) +
@@ -72,25 +73,30 @@ namespace SplitBackDotnet.Helper
           Transfers
           .Where(tr => tr.ReceiverId == Spenders[spndr].Id)
           .Sum(transfer => transfer.Amount);
-
-          decimal DebtOrCredit = Spenders[spndr].Balance + Spenders[spndr].MoneySummedAndDistributed;
-          if (DebtOrCredit > 0)
-          {
-            Debtors.Add(new Debtor { Id = Spenders[spndr].Id, Balance = DebtOrCredit });
-          }
-          else if (DebtOrCredit < 0)
-          {
-            Creditors.Add(new Creditor { Id = Spenders[spndr].Id, Balance = DebtOrCredit });
-          }
         }
       }
 
-      List<PendingTransaction> PendingTransactions = new List<PendingTransaction>();
+      for (int spndr = 0; spndr < Spenders.Length; spndr++)
+      {
+        decimal DebtOrCredit = Spenders[spndr].Balance + Spenders[spndr].MoneySummedAndDistributed;
+        if (DebtOrCredit > 0)
+        {
+          Debtors.Add(new Debtor { Id = Spenders[spndr].Id, Balance = DebtOrCredit });
+        }
+        else if (DebtOrCredit < 0)
+        {
+          Creditors.Add(new Creditor { Id = Spenders[spndr].Id, Balance = DebtOrCredit });
+        }
+      }
+
+      var NewPendingTransactions = new List<PendingTransaction>();
 
       while (Debtors.Count > 0 && Creditors.Count > 0)
       {
         Debtor PoppedDebtor = Debtors.ElementAt(Debtors.Count - 1);
+        Debtors.RemoveAt(Debtors.Count - 1);
         Creditor PoppedCreditor = Creditors.ElementAt(Creditors.Count - 1);
+        Creditors.RemoveAt(Creditors.Count - 1);
         decimal Diff = PoppedDebtor.Balance + PoppedCreditor.Balance;
         decimal AmountPaid = 0;
 
@@ -108,18 +114,14 @@ namespace SplitBackDotnet.Helper
           Debtors.Add(new Debtor { Id = PoppedDebtor.Id, Balance = Diff });
           AmountPaid = Math.Abs(PoppedCreditor.Balance);
         }
-        PendingTransactions.Add(new PendingTransaction { SenderId = PoppedDebtor.Id, ReceiverId = PoppedCreditor.Id, Amount = AmountPaid });
+        NewPendingTransactions.Add(new PendingTransaction { SenderId = PoppedDebtor.Id, ReceiverId = PoppedCreditor.Id, Amount = AmountPaid, CurrentGroupId = Group.GroupId, Group=Group });
       }
-      return PendingTransactions;
+      Group.PendingTransactions = NewPendingTransactions;
+      await repo.SaveChangesAsync();
+      //return PendingTransactions;
     }
   }
 }
-
-
-
-
-
-
 
 // for (int spndr = 0; spndr < Spenders.Length; spndr++)
 // {

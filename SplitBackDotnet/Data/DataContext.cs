@@ -20,6 +20,8 @@ public class DataContext : DbContext
   public DbSet<Transfer> Transfers { get; set; } = null!;
   public DbSet<Label> Labels { get; set; } = null!;
   public DbSet<Session> Sessions { get; set; } = null!;
+  public DbSet<PendingTransaction> PendingTransactions { get; set; } = null!;
+  public DbSet<Currency> Currencies {get;set;}=null!;
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     modelBuilder.Entity<User>().HasIndex(user => user.Email).IsUnique();
@@ -47,11 +49,16 @@ public class DataContext : DbContext
     .WithMany(e => e.ExpenseParticipants)
     .HasForeignKey(s => s.ExpenseId);
 
-    modelBuilder.Entity<ExpenseParticipant>()
+   modelBuilder.Entity<ExpenseParticipant>()
    .HasOne<User>(s => s.Participant)
    .WithMany(p => p.ExpenseParticipants)
    .HasForeignKey(s => s.ParticipantId);
     //End of Share
 
+    modelBuilder.Entity<Group>()
+    .HasMany<PendingTransaction>(g => g.PendingTransactions)
+    .WithOne(pt => pt.Group)
+    .HasForeignKey(pt => pt.CurrentGroupId)
+    .OnDelete(DeleteBehavior.Cascade);
   }
 }

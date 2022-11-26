@@ -19,8 +19,9 @@ namespace SplitBackDotnet.Data
       .Include(group => group.Members)
       .Include(group => group.Expenses)
       .Include(group => group.Transfers)
-      .Include(group => group.Expenses.Select(exp => exp.ExpenseParticipants)) 
-      .Include(group => group.Expenses.Select(exp => exp.ExpenseSpenders))
+      .Include(group => group.PendingTransactions)
+      .Include(group => group.Expenses).ThenInclude(exp => exp.ExpenseParticipants)
+      .Include(group => group.Expenses).ThenInclude(exp => exp.ExpenseSpenders)
       .FirstOrDefaultAsync(group => group.GroupId == groupId);
     }
     public async Task CreateGroup(Group group)

@@ -11,6 +11,7 @@ public class UserProfile : Profile
     //source ->target
     CreateMap<UserCreateDto, User>();
     CreateMap<LabelDto, Label>();
+    CreateMap<CurrencyDto, Currency>();
     //CreateMap<UserShareDto, User>();
     CreateMap<ExpenseParticipantDto, ExpenseParticipant>();
     CreateMap<ExpenseSpenderDto, ExpenseSpender>();

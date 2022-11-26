@@ -5,6 +5,9 @@ using SplitBackDotnet.Dtos;
 using AutoMapper;
 using SplitBackDotnet.Helper;
 using Microsoft.AspNetCore.Authorization;
+using NMoneys;
+using NMoneys.Allocations;
+using NMoneys.Extensions;
 
 namespace SplitBackDotnet.Endpoints;
 
@@ -12,23 +15,6 @@ public static class ExpenseEndpoints
 {
   public static void MapExpenseEndpoints(this IEndpointRouteBuilder app)
   {
-
-    app.MapGet("/expense", async (DataContext context) => await context.Expenses.ToListAsync());
-
-    app.MapPost("/expense", async (DataContext context, Expense expense) =>
-    {
-      User? userFound = context.Users.FirstOrDefault(user => user.Nickname == "nanakis");
-      context.Add(expense);
-      await context.SaveChangesAsync();
-      return await context.Expenses.ToArrayAsync();
-    }).RequireAuthorization();
-
-    app.MapGet("/test", () =>
-    {
-      string x = "This is a test route";
-      //Console.WriteLine(x);
-    });
-
     app.MapPost("/creategroup", [Authorize] async (HttpContext httpContext, IRepo repo, IMapper mapper, DataContext context, CreateGroupDto createGroupDto) =>
     {
       var group = mapper.Map<Group>(createGroupDto);
@@ -40,10 +26,15 @@ public static class ExpenseEndpoints
     app.MapPost("/addExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) =>
     {
       var newExpense = mapper.Map<Expense>(newExpenseDto);
+      var x = newExpenseDto.Amount.Inr().ToString();
+      var y = new Money(newExpenseDto.Amount,NMoneys.Currency.Code.Parse("EU")).ToString();
+      Allocation fair = newExpenseDto.Amount.Inr().Allocate(newExpenseDto.ExpenseParticipants.Count); //40m.Eur().Allocate(4);
+      //var List  = newExpenseDto.Amount.Xxx().Allocate(newExpenseDto.ExpenseParticipants.Count).ToList();
+      // var currencyIsoCode = CurrencyIsoCode.AUD;
       var Group = await repo.GetGroupById(newExpenseDto.GroupId);
       Group?.Expenses?.Add(newExpense);
       await repo.SaveChangesAsync();
-      var result = CalcPending.PendingTransactions(Group.Expenses, Group.Transfers, Group.Members);
+      CalcPending.PendingTransactions(Group.Expenses, Group.Transfers, Group.Members, Group, repo, context);
     });
   }
 }

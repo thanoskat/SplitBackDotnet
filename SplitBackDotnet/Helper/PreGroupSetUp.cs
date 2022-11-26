@@ -9,8 +9,6 @@ namespace SplitBackDotnet.Helper
     {
       int UserId = Convert.ToInt32(httpContext.User.FindFirst("userId").Value);
       User? UserFound = context.Users.FirstOrDefault(user => user.UserId == UserId);
-      // ICollection<User> collection = new List<User>();
-      // collection.Add(UserFound);
       Group.Members.Add(UserFound);
       Group.Creator = UserFound;
     }
