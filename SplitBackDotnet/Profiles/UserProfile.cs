@@ -16,6 +16,7 @@ public class UserProfile : Profile
     CreateMap<ExpenseParticipantDto, ExpenseParticipant>();
     CreateMap<ExpenseSpenderDto, ExpenseSpender>();
     CreateMap<NewExpenseDto, Expense>();
+    // .ForMember(dest => dest.Currency, opt => opt.Ignore());
     CreateMap<CreateGroupDto, Group>()
     .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => src.GroupLabels));
   }

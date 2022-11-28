@@ -1,6 +1,5 @@
 
 using System.ComponentModel.DataAnnotations;
-using NMoneys;
 namespace SplitBackDotnet.Dtos
 {
 
@@ -29,7 +28,9 @@ namespace SplitBackDotnet.Dtos
   }
   public class CurrencyDto
   {
-    public CurrencyIsoCode CurrencyIsoCode { get; set; }
+    public int CurrencyId { get; set; }
+    [MaxLength(3)]
+    public string isoCode { get; set; } = null!;
   }
 
   public class NewExpenseDto

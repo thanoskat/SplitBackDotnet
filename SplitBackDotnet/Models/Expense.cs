@@ -15,5 +15,5 @@ public class Expense
   [Required]
   public ICollection<ExpenseParticipant> ExpenseParticipants { get; set; } = new List<ExpenseParticipant>();
   public Currency Currency { get; set; } = null!;
-
+  public int CurrencyId { get; set; }
 }
