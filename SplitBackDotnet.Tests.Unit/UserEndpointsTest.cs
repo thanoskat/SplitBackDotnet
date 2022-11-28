@@ -43,7 +43,7 @@ public class UserEndpointsTests {
     };
 
     //Act
-    var actualResult = (Ok<List<User>>) await UserEndpoints.AddUser(context, mapper, newUser);
+    var actualResult = await UserEndpoints.AddUser(context, mapper, newUser) as Ok<List<User>>;
     var responseList = new List<User> {
       new User {
         Id = 1,
@@ -54,7 +54,7 @@ public class UserEndpointsTests {
     var expectedResult = Results.Ok(responseList);
 
     //Assert
-    //Assert.Equal(((Ok<List<User>>?)expectedResult)?.Value?[0].Email, actualResult.Value?[0].Email);
+    // Assert.Equal(((Ok<List<User>>?)expectedResult)?.Value?[0].Email, actualResult.Value?[0].Email);
     //Assert.Equal(((Ok<List<User>>?)expectedResult)?.Value?[0].Nickname, actualResult.Value?[0].Nickname);
     Assert.IsType<Ok<List<User>>>(actualResult);
   }

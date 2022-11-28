@@ -6,6 +6,8 @@ using SplitBackDotnet.Data;
 using SplitBackDotnet.Dtos;
 using SplitBackDotnet.Helper;
 using SplitBackDotnet.Models;
+using SplitBackDotnet.Services.EmailService;
+using SplitBackDotnet.Services.JwtFactory;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -247,33 +249,42 @@ public static class AuthenticationEndpoints {
     });
   }
 
-  public static IResult RequestSignUp(HttpResponse response, IMapper mapper, IConfiguration config, DataContext context, UserCreateDto userCreateDto) {
+  public static IResult RequestSignUp(HttpResponse response, IMapper mapper, IConfiguration config, DataContext context, UserCreateDto userCreateDto, IEmailService emailService, IJwtFactory jwtFactory) {
     if(context.Users.Any(_user => _user.Email == userCreateDto.Email)) {
       return Results.Ok("User already exists!");
     }
 
     var unique = Guid.NewGuid().ToString();
 
-    var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
-    var securityKey = new SymmetricSecurityKey(secureKey);
-    var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
-    var jwtTokenHandler = new JwtSecurityTokenHandler();
+    jwtFactory.Claims = new ClaimsIdentity(new[] {
+      new Claim("type", "sign-up"),
+      new Claim("email", userCreateDto.Email.ToString()),
+      new Claim("nickname", userCreateDto.Nickname.ToString()),
+      new Claim("unique", unique),
+    });
 
-    var tokenDescriptor = new SecurityTokenDescriptor {
-      Subject = new ClaimsIdentity(new[] {
-          new Claim("type", "sign-up"),
-          new Claim("email", userCreateDto.Email.ToString()),
-          new Claim("nickname", userCreateDto.Nickname.ToString()),
-          new Claim("unique", unique),
-        }),
-      Expires = DateTime.Now.AddMinutes(1),
-      Audience = config["Jwt:Audience"],
-      Issuer = config["Jwt:Issuer"],
-      SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512)
-    };
+    var jwtToken = jwtFactory.GenerateToken();
 
-    var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-    var jwtToken = jwtTokenHandler.WriteToken(token);
+    //var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
+    //var securityKey = new SymmetricSecurityKey(secureKey);
+    //var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
+    //var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+    //var tokenDescriptor = new SecurityTokenDescriptor {
+    //  Subject = new ClaimsIdentity(new[] {
+    //      new Claim("type", "sign-up"),
+    //      new Claim("email", userCreateDto.Email.ToString()),
+    //      new Claim("nickname", userCreateDto.Nickname.ToString()),
+    //      new Claim("unique", unique),
+    //    }),
+    //  Expires = DateTime.Now.AddMinutes(1),
+    //  Audience = config["Jwt:Audience"],
+    //  Issuer = config["Jwt:Issuer"],
+    //  SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512)
+    //};
+
+    //var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+    //var jwtToken = jwtTokenHandler.WriteToken(token);
 
     response.Cookies.Append("unique", unique, new CookieOptions {
       SameSite = SameSiteMode.Lax,
@@ -282,7 +293,15 @@ public static class AuthenticationEndpoints {
       Expires = DateTime.UtcNow.AddDays(30),
       MaxAge = TimeSpan.FromDays(30)
     });
-    Console.WriteLine($"Sign up verification link with to {userCreateDto.Email}. {jwtToken}");
+
+    var newEmailMessage = new EmailDto {
+      Body = jwtToken,
+      Subject = "sign up request",
+      To = userCreateDto.Email
+    };
+
+    emailService.SendEmail(newEmailMessage);
+
     return Results.Ok(jwtToken); //Adding quotes around string
     //return Results.Text(jwtToken); //Doesnt add quotes around string
   }

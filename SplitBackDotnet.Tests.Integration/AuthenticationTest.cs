@@ -24,7 +24,7 @@ public class AuthenticationTest : IClassFixture<TestWebApplicationFactory<Progra
 
   [Fact]
   public async Task SignUp_Test() {
-    
+
     var requestSignUpResponse = await _httpClient.PostAsJsonAsync("/auth/request-sign-up", newUser);
     //response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string>? value);
     var stringInResponse = await requestSignUpResponse.Content.ReadAsStringAsync();
