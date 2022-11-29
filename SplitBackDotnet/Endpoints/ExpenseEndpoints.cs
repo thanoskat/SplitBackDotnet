@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SplitBackDotnet.Data;
+﻿using SplitBackDotnet.Data;
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Dtos;
 using AutoMapper;
@@ -25,27 +24,18 @@ public static class ExpenseEndpoints
 
     app.MapPost("/addExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) =>
     {
-      var Group = await repo.GetGroupById(newExpenseDto.GroupId);
-      if (context.Currencies.Any(c => c.isoCode == newExpenseDto.Currency.isoCode))
+      try
       {
+        var Group = await repo.GetGroupById(newExpenseDto.GroupId);
         var Currency = context.Currencies.FirstOrDefault(c => c.isoCode == newExpenseDto.Currency.isoCode);
-        Expense Expense = new Expense();
-        Expense.ExpenseParticipants = mapper.Map<ICollection<ExpenseParticipant>>(newExpenseDto.ExpenseParticipants);
-        Expense.ExpenseSpenders = mapper.Map<ICollection<ExpenseSpender>>(newExpenseDto.ExpenseSpenders);
-        Expense.Currency = Currency;
-        Expense.Amount = newExpenseDto.Amount;
-        Expense.Description = newExpenseDto.Description;
-        Group?.Expenses?.Add(Expense);
-        await repo.SaveChangesAsync();
+        ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
+        await repo.AddNewExpense(Currency!, newExpenseDto, Group!, mapper);
+        CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
       }
-      else
+      catch
       {
-        var newExpense = mapper.Map<Expense>(newExpenseDto);
-        //context.Currencies.Attach(mapper.Map<Models.Currency>(newExpenseDto.Currency));
-        Group?.Expenses?.Add(newExpense);
-        await repo.SaveChangesAsync();
+        Console.WriteLine("Expense Error");
       }
-      CalcPending.PendingTransactions(Group.Expenses, Group.Transfers, Group.Members, Group, repo, context);
     });
   }
 }

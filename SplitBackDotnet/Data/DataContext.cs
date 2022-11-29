@@ -61,12 +61,19 @@ public class DataContext : DbContext
     .HasForeignKey(pt => pt.CurrentGroupId)
     .OnDelete(DeleteBehavior.Cascade);
 
+    // modelBuilder.Entity<Currency>()
+    // .HasMany<Expense>(c => c.Expenses)
+    // .WithOne(e => e.Currency)
+    // .HasForeignKey(e => e.CurrencyId)
+    // .OnDelete(DeleteBehavior.Cascade);
+
+    modelBuilder.Entity<Currency>()
+    .HasKey(c=>c.IsoCode);
+
     modelBuilder.Entity<Currency>()
     .HasMany<Expense>(c => c.Expenses)
-    .WithOne(e => e.Currency)
-    .HasForeignKey(e => e.CurrencyId)
-    .OnDelete(DeleteBehavior.Cascade);
+    .WithOne(e=>e.Currency)
+    .HasForeignKey(e=>e.IsoCode)
+    .OnDelete(DeleteBehavior.Cascade);;
   }
-
-
 }

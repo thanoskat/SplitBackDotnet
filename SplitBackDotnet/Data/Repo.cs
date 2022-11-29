@@ -1,5 +1,7 @@
 using SplitBackDotnet.Models;
 using Microsoft.EntityFrameworkCore;
+using SplitBackDotnet.Dtos;
+using AutoMapper;
 
 namespace SplitBackDotnet.Data
 {
@@ -42,13 +44,25 @@ namespace SplitBackDotnet.Data
       await _context.AddAsync(label);
     }
 
-    public async Task AddNewExpense(Expense expense)
+    public async Task AddNewExpense(Currency Currency, NewExpenseDto newExpenseDto, Group Group, IMapper mapper)
     {
-      if (expense == null)
+       if (Currency != null)
       {
-        throw new ArgumentNullException(nameof(expense));
+        Expense Expense = new Expense();
+        Expense.ExpenseParticipants = mapper.Map<ICollection<ExpenseParticipant>>(newExpenseDto.ExpenseParticipants);
+        Expense.ExpenseSpenders = mapper.Map<ICollection<ExpenseSpender>>(newExpenseDto.ExpenseSpenders);
+        Expense.Currency = Currency;
+        Expense.Amount = newExpenseDto.Amount;
+        Expense.Description = newExpenseDto.Description;
+        Group?.Expenses?.Add(Expense);
+        await SaveChangesAsync();
       }
-      await _context.AddAsync(expense);
+      else
+      {
+        var newExpense = mapper.Map<Expense>(newExpenseDto);
+        Group?.Expenses?.Add(newExpense);
+        await SaveChangesAsync();
+      }
     }
     public async Task SaveChangesAsync()
     {

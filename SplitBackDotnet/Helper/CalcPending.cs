@@ -1,6 +1,5 @@
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Data;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace SplitBackDotnet.Helper
@@ -33,8 +32,6 @@ namespace SplitBackDotnet.Helper
   {
     public static async void PendingTransactions(ICollection<Expense> Expenses, ICollection<Transfer> Transfers, ICollection<User> Members, Group Group, IRepo repo, DataContext context)
     {
-      // List<Spender> Spenders1 = new List<Spender>(Members.Count);
-      // Separate spenders in debtors and creditors
       List<Debtor> Debtors = new List<Debtor>();
       List<Creditor> Creditors = new List<Creditor>();
       Spender[] Spenders = new Spender[Members.Count];
@@ -48,13 +45,7 @@ namespace SplitBackDotnet.Helper
       // Loop through expenses
       for (int e = 0; e < Expenses.Count; e++)
       {
-        var Amount = Expenses.ElementAt(e).Amount;
-        TotalSpent += Amount;
-        decimal TotalAmountCheck = Expenses
-        .ElementAt(e)
-        .ExpenseParticipants.Where(ep => ep.ExpenseId == Expenses.ElementAt(e).ExpenseId)
-        .Sum(ep => ep.ContributionAmount);
-        if (TotalAmountCheck != Amount) throw new ArgumentException($"{nameof(Amount)} is not equal to {nameof(TotalAmountCheck)}");
+        ExpenseSetUp.CheckTotalAmountVsTotalContributions(Expenses, TotalSpent, e);
 
         for (int spndr = 0; spndr < Spenders.Length; spndr++)
         {
@@ -114,7 +105,7 @@ namespace SplitBackDotnet.Helper
           Debtors.Add(new Debtor { Id = PoppedDebtor.Id, Balance = Diff });
           AmountPaid = Math.Abs(PoppedCreditor.Balance);
         }
-        NewPendingTransactions.Add(new PendingTransaction { SenderId = PoppedDebtor.Id, ReceiverId = PoppedCreditor.Id, Amount = AmountPaid, CurrentGroupId = Group.GroupId, Group=Group });
+        NewPendingTransactions.Add(new PendingTransaction { SenderId = PoppedDebtor.Id, ReceiverId = PoppedCreditor.Id, Amount = AmountPaid, CurrentGroupId = Group.GroupId, Group = Group });
       }
       Group.PendingTransactions = NewPendingTransactions;
       await repo.SaveChangesAsync();
