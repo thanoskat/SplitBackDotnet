@@ -178,7 +178,7 @@ public static class AuthenticationEndpoints {
         MaxAge = TimeSpan.FromDays(30)
       });
       Console.WriteLine($"Sign up verification link with to {userCreateDto.Email}. {jwtToken}");
-      return Results.Ok($"Sign up verification link with to {userCreateDto.Email}. {jwtToken}");
+      return Results.Ok($"{jwtToken}");
     });
 
     app.MapPost("/auth/request-sign-in", async (EmailBody emailBody, HttpResponse response, IConfiguration config, DataContext context) => {
@@ -216,7 +216,7 @@ public static class AuthenticationEndpoints {
       });
 
       Console.WriteLine($"Sign in verification link with to {emailBody.Email}. {jwtToken}");
-      return Results.Ok($"Sign in verification link with to {emailBody.Email}. {jwtToken}");
+      return Results.Ok($"{jwtToken}");
     });
 
     app.MapPost("/auth/refreshtoken", async (HttpRequest request, DataContext context, IConfiguration config) => {
