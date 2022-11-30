@@ -2,7 +2,7 @@
 using SplitBackDotnet.Dtos;
 using SplitBackDotnet.Models;
 
-namespace SplitBackDotnet.Profiles;
+namespace SplitBackDotnet.Validators;
 
 public class UserProfile : Profile
 {
@@ -11,8 +11,6 @@ public class UserProfile : Profile
     //source ->target
     CreateMap<UserCreateDto, User>();
     CreateMap<LabelDto, Label>();
-    CreateMap<CurrencyDto, Currency>();
-    //CreateMap<UserShareDto, User>();
     CreateMap<ExpenseParticipantDto, ExpenseParticipant>();
     CreateMap<ExpenseSpenderDto, ExpenseSpender>();
     CreateMap<NewExpenseDto, Expense>();

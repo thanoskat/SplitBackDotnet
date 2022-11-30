@@ -7,7 +7,7 @@ namespace SplitBackDotnet.Data {
     Task SaveChangesAsync();
     Task CreateGroup(Group group);
     Task AddLabel (Label label);
-    Task AddNewExpense (Currency Currency, NewExpenseDto newExpenseDto, Group Group, IMapper mapper);
+    Task AddNewExpense (NewExpenseDto newExpenseDto,IMapper mapper);
     Task<Group?> GetGroupById(int groupId);
 
   }

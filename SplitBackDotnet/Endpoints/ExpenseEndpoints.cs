@@ -1,6 +1,7 @@
 ﻿using SplitBackDotnet.Data;
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Dtos;
+using SplitBackDotnet.Validators;
 using AutoMapper;
 using SplitBackDotnet.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -26,10 +27,11 @@ public static class ExpenseEndpoints
     {
       try
       {
+        var ExpenseValidator = new ExpenseValidator(newExpenseDto);
+        var result = ExpenseValidator.Validate(newExpenseDto);
         var Group = await repo.GetGroupById(newExpenseDto.GroupId);
-        var Currency = context.Currencies.FirstOrDefault(c => c.isoCode == newExpenseDto.Currency.isoCode);
         ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
-        await repo.AddNewExpense(Currency!, newExpenseDto, Group!, mapper);
+        await repo.AddNewExpense(newExpenseDto, mapper);
         CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
       }
       catch

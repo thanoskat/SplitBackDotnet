@@ -24,7 +24,6 @@ namespace SplitBackDotnet.Data
       .Include(group => group.PendingTransactions)
       .Include(group => group.Expenses).ThenInclude(exp => exp.ExpenseParticipants)
       .Include(group => group.Expenses).ThenInclude(exp => exp.ExpenseSpenders)
-      .Include(group => group.Expenses).ThenInclude(exp => exp.Currency)
       .FirstOrDefaultAsync(group => group.GroupId == groupId);
     }
     public async Task CreateGroup(Group group)
@@ -44,25 +43,12 @@ namespace SplitBackDotnet.Data
       await _context.AddAsync(label);
     }
 
-    public async Task AddNewExpense(Currency Currency, NewExpenseDto newExpenseDto, Group Group, IMapper mapper)
+    public async Task AddNewExpense(NewExpenseDto newExpenseDto, IMapper mapper)
     {
-       if (Currency != null)
-      {
-        Expense Expense = new Expense();
-        Expense.ExpenseParticipants = mapper.Map<ICollection<ExpenseParticipant>>(newExpenseDto.ExpenseParticipants);
-        Expense.ExpenseSpenders = mapper.Map<ICollection<ExpenseSpender>>(newExpenseDto.ExpenseSpenders);
-        Expense.Currency = Currency;
-        Expense.Amount = newExpenseDto.Amount;
-        Expense.Description = newExpenseDto.Description;
-        Group?.Expenses?.Add(Expense);
-        await SaveChangesAsync();
-      }
-      else
-      {
         var newExpense = mapper.Map<Expense>(newExpenseDto);
-        Group?.Expenses?.Add(newExpense);
+        await _context.AddAsync<Expense>(newExpense);
         await SaveChangesAsync();
-      }
+      
     }
     public async Task SaveChangesAsync()
     {

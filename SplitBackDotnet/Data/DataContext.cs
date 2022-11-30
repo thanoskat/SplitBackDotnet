@@ -21,7 +21,6 @@ public class DataContext : DbContext
   public DbSet<Label> Labels { get; set; } = null!;
   public DbSet<Session> Sessions { get; set; } = null!;
   public DbSet<PendingTransaction> PendingTransactions { get; set; } = null!;
-  public DbSet<Currency> Currencies { get; set; } = null!;
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     modelBuilder.Entity<User>().HasIndex(user => user.Email).IsUnique();
@@ -61,19 +60,10 @@ public class DataContext : DbContext
     .HasForeignKey(pt => pt.CurrentGroupId)
     .OnDelete(DeleteBehavior.Cascade);
 
-    // modelBuilder.Entity<Currency>()
-    // .HasMany<Expense>(c => c.Expenses)
-    // .WithOne(e => e.Currency)
-    // .HasForeignKey(e => e.CurrencyId)
-    // .OnDelete(DeleteBehavior.Cascade);
+    modelBuilder.Entity<Group>()
+    .HasMany<Expense>(g => g.Expenses)
+    .WithOne(e => e.Group)
+    .HasForeignKey(e => e.GroupId);
 
-    modelBuilder.Entity<Currency>()
-    .HasKey(c=>c.IsoCode);
-
-    modelBuilder.Entity<Currency>()
-    .HasMany<Expense>(c => c.Expenses)
-    .WithOne(e=>e.Currency)
-    .HasForeignKey(e=>e.IsoCode)
-    .OnDelete(DeleteBehavior.Cascade);;
   }
 }
