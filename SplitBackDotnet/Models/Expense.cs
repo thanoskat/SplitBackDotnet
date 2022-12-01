@@ -10,7 +10,7 @@ public class Expense
   [Required]
   public decimal Amount { get; set; }
   [MaxLength(3)]
-  public string isoCode { get; set; } = null!;
+  public string IsoCode { get; set; } = null!;
   public Label? Label { get; set; }
   [Required]
   public ICollection<ExpenseSpender> ExpenseSpenders { get; set; } = new List<ExpenseSpender>();
