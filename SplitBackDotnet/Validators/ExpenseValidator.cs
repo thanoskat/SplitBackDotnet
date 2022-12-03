@@ -6,31 +6,53 @@ public class ExpenseValidator : AbstractValidator<NewExpenseDto>
 {
   public ExpenseValidator()
   {
-    RuleFor(newExpense => newExpense.IsoCode).IsEnumName(typeof(CurrencyIsoCode))
+    RuleFor(newExpense => newExpense.IsoCode)
+    .IsEnumName(typeof(CurrencyIsoCode))
     .WithMessage("Invalid Currency");
 
     RuleFor(newExpense => newExpense.Amount)
     .Must(x => decimal.TryParse(x, out var val))
-    .WithMessage("Amount must be a number.")
+    .WithMessage("A valid amount is required")
     .DependentRules(() =>
     {
+      RuleFor(newExpense => newExpense.Amount)
+      .Must(Amount => Amount.ToDecimal() > 0)
+      .WithMessage("Amount cannot be negative or zero");
+
       RuleFor(newExpense => newExpense.Description)
+      //.Cascade(CascadeMode.Stop)
       .NotNull().NotEmpty().WithMessage("Description is required");
 
       When(newExpense => !newExpense.SplitEqually && newExpense.ExpenseParticipants.Count >= 2, () =>
    {
-     RuleFor(newExpense => newExpense)
-     .Must(ne => ne.ExpenseParticipants.
-     Sum(ep => ep.ContributionAmount) == ne.Amount.ToDecimal())
-     .WithMessage("Member amounts don\'t add up to total.");
+     RuleForEach(newExpense => newExpense.ExpenseParticipants)
+    .Must(ep => ep.ContributionAmount.CheckIfDecimal())
+    .WithMessage("A valid amount is required")
+    .DependentRules(() =>
+    {
+      RuleFor(newExpense => newExpense)
+      .Must(ne => ne.ExpenseParticipants
+      .Sum(ep => ep.ContributionAmount.ToDecimal()) == ne.Amount.ToDecimal())
+      .WithMessage("Member amounts don\'t add up to total");
+
+      // RuleFor(newExpense => newExpense.ExpenseParticipants.Sum(ep => ep.ContributionAmount.ToDecimal()) == newExpense.Amount.ToDecimal())
+      // .Must(sum => sum == true)
+      // .WithMessage("Member amounts don\'t add up to total");
+    });
    });
 
       When(newExpense => newExpense.ExpenseSpenders.Count >= 2, () =>
     {
-      RuleFor(newExpense => newExpense)
+      RuleForEach(newExpense => newExpense.ExpenseParticipants)
+     .Must(ep => ep.ContributionAmount.CheckIfDecimal())
+     .WithMessage("A valid amount is required")
+     .DependentRules(() =>
+     {
+       RuleFor(newExpense => newExpense)
       .Must(ne => ne.ExpenseSpenders
-      .Sum(es => es.SpenderAmount) == ne.Amount.ToDecimal())
-     .WithMessage("Payers\' amounts don\'t add up to total.");
+      .Sum(es => es.SpenderAmount.ToDecimal()) == ne.Amount.ToDecimal())
+      .WithMessage("Payers\' amounts don\'t add up to total");
+     });
     });
 
       RuleFor(newExpense => newExpense.ExpenseParticipants.Count)

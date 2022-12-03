@@ -5,9 +5,6 @@ namespace SplitBackDotnet.Data;
 
 public class DataContext : DbContext
 {
-  //public DataContext() {
-  //}
-
   public DataContext(DbContextOptions<DataContext> options) : base(options)
   {
   }
@@ -65,5 +62,10 @@ public class DataContext : DbContext
     .WithOne(e => e.Group)
     .HasForeignKey(e => e.GroupId);
 
+    modelBuilder.Entity<Group>()
+    .HasMany<Transfer>(g => g.Transfers)
+    .WithOne(t => t.Group)
+    .HasForeignKey(e => e.GroupId)
+    .OnDelete(DeleteBehavior.Cascade);
   }
 }

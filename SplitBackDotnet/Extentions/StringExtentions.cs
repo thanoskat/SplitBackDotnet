@@ -16,4 +16,17 @@ public static class StringExtentions
       throw new Exception();
     }
   }
+
+  public static bool CheckIfDecimal(this string str)
+  {
+    bool successfullyParsed = decimal.TryParse(str, out decimal x);
+    if (successfullyParsed)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
 }

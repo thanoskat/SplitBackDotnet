@@ -23,7 +23,7 @@ namespace SplitBackDotnet.Helper
         int index = 0;
         foreach (ExpenseParticipantDto Participant in newExpenseDto.ExpenseParticipants)
         {
-          Participant.ContributionAmount = DistributedAmountArr[index].Amount;
+          Participant.ContributionAmount = DistributedAmountArr[index].Amount.ToString();
           index = index + 1;
         }
       }
@@ -36,7 +36,7 @@ namespace SplitBackDotnet.Helper
       decimal TotalAmountCheck = Expenses
       .ElementAt(e)
       .ExpenseParticipants.Where(ep => ep.ExpenseId == Expenses.ElementAt(e).ExpenseId)
-      .Sum(ep => ep.ContributionAmount);
+      .Sum(ep => ep.ContributionAmount.ToDecimal());
       if (TotalAmountCheck != Amount) throw new ArgumentException($"{nameof(Amount)} is not equal to {nameof(TotalAmountCheck)}");
     }
   }

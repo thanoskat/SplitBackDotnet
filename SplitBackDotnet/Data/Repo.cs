@@ -45,10 +45,17 @@ namespace SplitBackDotnet.Data
 
     public async Task AddNewExpense(NewExpenseDto newExpenseDto, IMapper mapper)
     {
-        var newExpense = mapper.Map<Expense>(newExpenseDto);
-        await _context.AddAsync<Expense>(newExpense);
-        await SaveChangesAsync();
-      
+      var newExpense = mapper.Map<Expense>(newExpenseDto);
+      await _context.AddAsync<Expense>(newExpense);
+      await SaveChangesAsync();
+
+    }
+
+    public async Task AddNewTransfer(NewTransferDto newTransferDto, IMapper mapper)
+    {
+      var newTransfer = mapper.Map<Transfer>(newTransferDto);
+      await _context.AddAsync<Transfer>(newTransfer);
+      await SaveChangesAsync();
     }
     public async Task SaveChangesAsync()
     {

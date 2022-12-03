@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SplitBackDotnet.Data;
 
@@ -10,9 +11,11 @@ using SplitBackDotnet.Data;
 namespace SplitBackDotnet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221201181233_mig5")]
+    partial class mig5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0-rc.1.22426.7");
@@ -206,15 +209,11 @@ namespace SplitBackDotnet.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(80)
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int?>("GroupId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("IsoCode")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("INTEGER");
@@ -365,13 +364,9 @@ namespace SplitBackDotnet.Migrations
 
             modelBuilder.Entity("SplitBackDotnet.Models.Transfer", b =>
                 {
-                    b.HasOne("SplitBackDotnet.Models.Group", "Group")
+                    b.HasOne("SplitBackDotnet.Models.Group", null)
                         .WithMany("Transfers")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
+                        .HasForeignKey("GroupId");
                 });
 
             modelBuilder.Entity("SplitBackDotnet.Models.Expense", b =>

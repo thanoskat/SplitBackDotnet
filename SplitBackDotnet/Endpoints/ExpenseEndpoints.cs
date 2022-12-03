@@ -42,7 +42,33 @@ public static class ExpenseEndpoints
         CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
         return Results.Ok();
       }
-      catch(Exception ex)
+      catch (Exception ex)
+      {
+        return Results.BadRequest(ex.Message);
+      }
+    });
+
+
+    app.MapPost("/addTransfer", async (IRepo repo, IMapper mapper, DataContext context, NewTransferDto newTransferDto) =>
+    {
+      try
+      {
+        var transferValidator = new TransferValidator();
+        var validationResult = transferValidator.Validate(newTransferDto);
+        if (validationResult.Errors.Count > 0)
+        {
+          return Results.Ok(validationResult.Errors.Select(x => new
+          {
+            Message = x.ErrorMessage,
+            Field = x.PropertyName
+          }));
+        }
+        var Group = await repo.GetGroupById(newTransferDto.GroupId);
+        await repo.AddNewTransfer(newTransferDto, mapper);
+        CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
+        return Results.Ok();
+      }
+      catch (Exception ex)
       {
         return Results.BadRequest(ex.Message);
       }

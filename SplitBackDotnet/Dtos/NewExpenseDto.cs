@@ -1,4 +1,3 @@
-
 using System.ComponentModel.DataAnnotations;
 namespace SplitBackDotnet.Dtos
 {
@@ -10,15 +9,18 @@ namespace SplitBackDotnet.Dtos
 
   public class ExpenseSpenderDto
   {
-    public int SpenderId { get; set; }
-    public decimal SpenderAmount { get; set; }
+    [MaxLength(20)]
+    public string SpenderId { get; set; }= null!;
+    [MaxLength(29)]
+    public string SpenderAmount { get; set; } = null!;
   }
 
   public class ExpenseParticipantDto
   {
-    public int ParticipantId { get; set; }
-    public decimal ContributionAmount { get; set; }
-
+    [MaxLength(20)]
+    public string ParticipantId { get; set; }= null!;
+    [MaxLength(29)]
+    public string ContributionAmount { get; set; } = null!;
   }
 
   public class NewExpenseDto
@@ -26,8 +28,10 @@ namespace SplitBackDotnet.Dtos
     public int GroupId { get; set; }
     [MaxLength(80)]
     public string Description { get; set; } = null!;
+    [MaxLength(29)]
     public string Amount { get; set; } = null!;
     public bool SplitEqually { get; set; }
+    [MaxLength(3)]
     public string IsoCode { get; set; } = null!;
     public LabelDto? Label { get; set; }
     public ICollection<ExpenseParticipantDto> ExpenseParticipants { get; set; } = null!;

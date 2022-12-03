@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SplitBackDotnet.Data;
 
@@ -10,9 +11,11 @@ using SplitBackDotnet.Data;
 namespace SplitBackDotnet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221203015111_mig7")]
+    partial class mig7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0-rc.1.22426.7");
@@ -211,10 +214,6 @@ namespace SplitBackDotnet.Migrations
 
                     b.Property<int>("GroupId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("IsoCode")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("INTEGER");

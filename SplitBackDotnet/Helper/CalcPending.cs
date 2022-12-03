@@ -1,5 +1,6 @@
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Data;
+using SplitBackDotnet.Extentions;
 
 
 namespace SplitBackDotnet.Helper
@@ -39,33 +40,42 @@ namespace SplitBackDotnet.Helper
       for (int m = 0; m < Members.Count; m++)
       {
         Spenders[m] = new Spender(Members.ElementAt(m).UserId, 0, 0);
+        //initialise spender as
+        //
+        //Spenders[m] = new Spender(Members.ElementAt(m).UserId, new Balance({EUR:0, GBP:0, USD:0}),new MoneySummedAndDistributed({EUR:0, GBP:0, USD:0}))
       }
       // Initialize total amount spent outside of group
       decimal TotalSpent = 0;
       // Loop through expenses
       for (int e = 0; e < Expenses.Count; e++)
       {
-        ExpenseSetUp.CheckTotalAmountVsTotalContributions(Expenses, TotalSpent, e);
-
+        //ExpenseSetUp.CheckTotalAmountVsTotalContributions(Expenses, TotalSpent, e); <-- Validator does this for us now
         for (int spndr = 0; spndr < Spenders.Length; spndr++)
         {
+          //foreach (Currency currency in GroupCurrencies)
           Spenders[spndr].MoneySummedAndDistributed += Expenses
           .ElementAt(e)
           .ExpenseParticipants.Where(ep => ep.ParticipantId == Spenders[spndr].Id)
-          .Sum(ep => ep.ContributionAmount);
+          .Sum(ep => ep.ContributionAmount.ToDecimal());
 
           Spenders[spndr].Balance += (-1) * Expenses
           .ElementAt(e)
           .ExpenseSpenders.Where(es => es.SpenderId == Spenders[spndr].Id)
-          .Sum(es => es.SpenderAmount) +
-          (-1) * Transfers
-          .Where(tr => tr.SenderId == Spenders[spndr].Id)
-          .Sum(transfer => transfer.Amount) +
-          Transfers
-          .Where(tr => tr.ReceiverId == Spenders[spndr].Id)
-          .Sum(transfer => transfer.Amount);
+          .Sum(es => es.SpenderAmount.ToDecimal());
         }
       }
+
+      for (int spndr = 0; spndr < Spenders.Length; spndr++)
+      {
+        Spenders[spndr].Balance += (-1) * Transfers
+        .Where(tr => tr.SenderId == Spenders[spndr].Id && tr.GroupId == Group.GroupId)
+        .Sum(transfer => transfer.Amount);//Change loop to for Transfers, this looks innefficient
+
+        Spenders[spndr].Balance += Transfers
+        .Where(tr => tr.ReceiverId == Spenders[spndr].Id && tr.GroupId == Group.GroupId)
+        .Sum(transfer => transfer.Amount);//Change loop to for Transfers
+      }
+
 
       for (int spndr = 0; spndr < Spenders.Length; spndr++)
       {
