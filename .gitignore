@@ -362,6 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /SplitBackDotnet/mydatabase.db
+/SplitBackDotnet/mydatabase.db.sql
 /SplitBackDotnet/appsettings.Development.json
 /SplitBackDotnet/mydatabase.db-shm
 /SplitBackDotnet/mydatabase.db-wal
