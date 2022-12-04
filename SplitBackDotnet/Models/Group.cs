@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace SplitBackDotnet.Models;
 
-public class Group
-{
+public class Group {
+
   public int GroupId { get; set; }
 
   [MaxLength(50)]

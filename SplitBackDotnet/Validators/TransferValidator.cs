@@ -1,6 +1,6 @@
 using FluentValidation;
 using SplitBackDotnet.Dtos;
-using SplitBackDotnet.Extentions;
+using SplitBackDotnet.Extensions;
 using NMoneys;
 
 //Probably need to validate max length of amounts

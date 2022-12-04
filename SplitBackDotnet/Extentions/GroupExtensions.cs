@@ -3,20 +3,7 @@ using SplitBackDotnet.Data;
 
 namespace SplitBackDotnet.Helper {
 
-  public record Participant {
-
-    public Participant(int id, decimal totalAmountGiven, decimal totalAmountTaken) {
-      Id = id;
-      TotalAmountGiven = totalAmountGiven;
-      TotalAmountTaken = totalAmountTaken;
-    }
-
-    public int Id { get; set; }
-    public decimal TotalAmountGiven { get; set; }
-    public decimal TotalAmountTaken { get; set; }
-  }
-
-  public static class CalcPending {
+  public static class GroupExtensions {
 
     public static List<PendingTransaction> PendingTransactions(this Group group, IRepo repo, DataContext context) {
 
@@ -119,5 +106,20 @@ namespace SplitBackDotnet.Helper {
 
       return pendingTransactions;
     }
+  }
+
+  public record Participant {
+
+    public Participant(int id, decimal totalAmountGiven, decimal totalAmountTaken) {
+      Id = id;
+      TotalAmountGiven = totalAmountGiven;
+      TotalAmountTaken = totalAmountTaken;
+    }
+
+    public int Id { get; set; }
+
+    public decimal TotalAmountGiven { get; set; }
+
+    public decimal TotalAmountTaken { get; set; }
   }
 }
