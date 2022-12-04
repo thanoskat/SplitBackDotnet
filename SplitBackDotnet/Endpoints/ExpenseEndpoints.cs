@@ -36,11 +36,10 @@ public static class ExpenseEndpoints
             Field = x.PropertyName
           }));
         }
-        var Group = await repo.GetGroupById(newExpenseDto.GroupId);
         ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
-        await repo.AddNewExpense(newExpenseDto, mapper);
-        CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
-        return Results.Ok();
+        await repo.AddNewExpense(mapper,newExpenseDto);
+        var group = await repo.GetGroupById(newExpenseDto.GroupId);
+        return Results.Ok(group.PendingTransactions(repo, context));
       }
       catch (Exception ex)
       {
@@ -65,7 +64,7 @@ public static class ExpenseEndpoints
         }
         var Group = await repo.GetGroupById(newTransferDto.GroupId);
         await repo.AddNewTransfer(newTransferDto, mapper);
-        CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
+        //CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
         return Results.Ok();
       }
       catch (Exception ex)

@@ -1,136 +1,119 @@
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Data;
-using SplitBackDotnet.Extentions;
-
 
 namespace SplitBackDotnet.Helper
 {
-  public class Spender : ISpender
+  public record Participant
   {
-    public Spender(int _Id, long _Balance, long _MoneySummedAndDistributed)
+    public Participant(int id, decimal totalAmountGiven, decimal totalAmountTaken)
     {
-      Id = _Id;
-      Balance = _Balance;
-      MoneySummedAndDistributed = _MoneySummedAndDistributed;
+      Id = id;
+      TotalAmountGiven = totalAmountGiven;
+      TotalAmountTaken = totalAmountTaken;
     }
     public int Id { get; set; }
-    public decimal Balance { get; set; }
-    public decimal MoneySummedAndDistributed { get; set; }
+    public decimal TotalAmountGiven { get; set; }
+    public decimal TotalAmountTaken { get; set; }
   }
+  
 
-  public class Debtor : ISpender
+  public static class CalcPending
   {
-    public int Id { get; set; }
-    public decimal Balance { get; set; }
-  }
-  public class Creditor : ISpender
-  {
-    public int Id { get; set; }
-    public decimal Balance { get; set; }
-  }
-
-  public class CalcPending
-  {
-    public static async void PendingTransactions(ICollection<Expense> Expenses, ICollection<Transfer> Transfers, ICollection<User> Members, Group Group, IRepo repo, DataContext context)
+    public static List<PendingTransaction> PendingTransactions(this Group group, IRepo repo, DataContext context)
     {
-      List<Debtor> Debtors = new List<Debtor>();
-      List<Creditor> Creditors = new List<Creditor>();
-      Spender[] Spenders = new Spender[Members.Count];
-      //https://stackoverflow.com/questions/202813/adding-values-to-a-c-sharp-array
-      for (int m = 0; m < Members.Count; m++)
+      var expenseListsByIsoCode = group.Expenses.GroupBy(exp => exp.IsoCode);
+      var transferListsByIsoCode = group.Transfers.GroupBy(tr => tr.IsoCode);
+      var isoCodeList = new List<string>();
+      expenseListsByIsoCode.ToList().ForEach(list => isoCodeList.Add(list.Key));
+      transferListsByIsoCode.ToList().ForEach(list => isoCodeList.Add(list.Key));
+      var uniqueIsoCodeList = isoCodeList.Distinct();
+      var pendingTransactions = new List<PendingTransaction>();
+
+      uniqueIsoCodeList.ToList().ForEach(currentIsoCode =>
       {
-        Spenders[m] = new Spender(Members.ElementAt(m).UserId, 0, 0);
-        //initialise spender as
-        //
-        //Spenders[m] = new Spender(Members.ElementAt(m).UserId, new Balance({EUR:0, GBP:0, USD:0}),new MoneySummedAndDistributed({EUR:0, GBP:0, USD:0}))
-      }
-      // Initialize total amount spent outside of group
-      decimal TotalSpent = 0;
-      // Loop through expenses
-      for (int e = 0; e < Expenses.Count; e++)
-      {
-        //ExpenseSetUp.CheckTotalAmountVsTotalContributions(Expenses, TotalSpent, e); <-- Validator does this for us now
-        for (int spndr = 0; spndr < Spenders.Length; spndr++)
+        var participants = new List<Participant>();
+
+        group.Members.ToList().ForEach(member =>
         {
-          //foreach (Currency currency in GroupCurrencies)
-          Spenders[spndr].MoneySummedAndDistributed += Expenses
-          .ElementAt(e)
-          .ExpenseParticipants.Where(ep => ep.ParticipantId == Spenders[spndr].Id)
-          .Sum(ep => ep.ContributionAmount.ToDecimal());
+          participants.Add(new Participant(member.UserId, 0m, 0m));
+        });
 
-          Spenders[spndr].Balance += (-1) * Expenses
-          .ElementAt(e)
-          .ExpenseSpenders.Where(es => es.SpenderId == Spenders[spndr].Id)
-          .Sum(es => es.SpenderAmount.ToDecimal());
-        }
-      }
-
-      for (int spndr = 0; spndr < Spenders.Length; spndr++)
-      {
-        Spenders[spndr].Balance += (-1) * Transfers
-        .Where(tr => tr.SenderId == Spenders[spndr].Id && tr.GroupId == Group.GroupId)
-        .Sum(transfer => transfer.Amount);//Change loop to for Transfers, this looks innefficient
-
-        Spenders[spndr].Balance += Transfers
-        .Where(tr => tr.ReceiverId == Spenders[spndr].Id && tr.GroupId == Group.GroupId)
-        .Sum(transfer => transfer.Amount);//Change loop to for Transfers
-      }
-
-
-      for (int spndr = 0; spndr < Spenders.Length; spndr++)
-      {
-        decimal DebtOrCredit = Spenders[spndr].Balance + Spenders[spndr].MoneySummedAndDistributed;
-        if (DebtOrCredit > 0)
+        group.Expenses.Where(exp=>exp.IsoCode==currentIsoCode).ToList().ForEach(expense =>
         {
-          Debtors.Add(new Debtor { Id = Spenders[spndr].Id, Balance = DebtOrCredit });
-        }
-        else if (DebtOrCredit < 0)
-        {
-          Creditors.Add(new Creditor { Id = Spenders[spndr].Id, Balance = DebtOrCredit });
-        }
-      }
+          expense.ExpenseParticipants.ToList().ForEach(expenseParticipant =>
+          {
+            participants.Single(p => p.Id == expenseParticipant.ParticipantId).TotalAmountTaken += expenseParticipant.ContributionAmount;
+          });
+          expense.ExpenseSpenders.ToList().ForEach(expenseSpender =>
+          {
+            participants.Single(p => p.Id == expenseSpender.SpenderId).TotalAmountGiven += expenseSpender.SpenderAmount;
+          });
+        });
 
-      var NewPendingTransactions = new List<PendingTransaction>();
+        group.Transfers.ToList().ForEach(transfer =>
+        {
+          participants.Single(p => p.Id == transfer.ReceiverId).TotalAmountTaken += transfer.Amount;
+          participants.Single(p => p.Id == transfer.SenderId).TotalAmountGiven += transfer.Amount;
+        });
 
-      while (Debtors.Count > 0 && Creditors.Count > 0)
-      {
-        Debtor PoppedDebtor = Debtors.ElementAt(Debtors.Count - 1);
-        Debtors.RemoveAt(Debtors.Count - 1);
-        Creditor PoppedCreditor = Creditors.ElementAt(Creditors.Count - 1);
-        Creditors.RemoveAt(Creditors.Count - 1);
-        decimal Diff = PoppedDebtor.Balance + PoppedCreditor.Balance;
-        decimal AmountPaid = 0;
+        var debtors = new Queue<Participant>();
+        var creditors = new Queue<Participant>();
 
-        if (Diff < 0)
+        participants.ForEach(p =>
         {
-          Creditors.Add(new Creditor { Id = PoppedCreditor.Id, Balance = Diff });
-          AmountPaid = Math.Abs(PoppedDebtor.Balance);
-        }
-        else if (Diff == 0)
+          switch (p.TotalAmountGiven - p.TotalAmountTaken)
+          {
+            case < 0:
+              debtors.Enqueue(p);
+              break;
+            case > 0:
+              creditors.Enqueue(p);
+              break;
+          }
+        });
+
+        while (debtors.Count > 0 && creditors.Count > 0)
         {
-          AmountPaid = Math.Abs(PoppedDebtor.Balance);
+          var poppedDebtor = debtors.Dequeue();
+          var poppedCreditor = creditors.Dequeue();
+          var debt = (poppedDebtor.TotalAmountTaken - poppedDebtor.TotalAmountGiven);
+          var credit = (poppedCreditor.TotalAmountGiven - poppedCreditor.TotalAmountTaken);
+          var diff = debt - credit;
+          switch (diff)
+          {
+            case < 0:
+              pendingTransactions.Add(new PendingTransaction
+              {
+                SenderId = poppedDebtor.Id,
+                ReceiverId = poppedCreditor.Id,
+                Amount = debt,
+                IsoCode = currentIsoCode,
+              });
+              creditors.Enqueue(poppedCreditor with { TotalAmountTaken = poppedCreditor.TotalAmountTaken + debt });
+              break;
+            case > 0:
+              pendingTransactions.Add(new PendingTransaction
+              {
+                SenderId = poppedDebtor.Id,
+                ReceiverId = poppedCreditor.Id,
+                Amount = credit,
+                IsoCode = currentIsoCode,
+              });
+              debtors.Enqueue(poppedDebtor with { TotalAmountGiven = poppedDebtor.TotalAmountGiven + credit });
+              break;
+            case 0:
+              pendingTransactions.Add(new PendingTransaction
+              {
+                SenderId = poppedDebtor.Id,
+                ReceiverId = poppedCreditor.Id,
+                Amount = credit, //credit == debt
+                IsoCode = currentIsoCode,
+              });
+              break;
+          }
         }
-        else if (Diff > 0)
-        {
-          Debtors.Add(new Debtor { Id = PoppedDebtor.Id, Balance = Diff });
-          AmountPaid = Math.Abs(PoppedCreditor.Balance);
-        }
-        NewPendingTransactions.Add(new PendingTransaction { SenderId = PoppedDebtor.Id, ReceiverId = PoppedCreditor.Id, Amount = AmountPaid, CurrentGroupId = Group.GroupId, Group = Group });
-      }
-      Group.PendingTransactions = NewPendingTransactions;
-      await repo.SaveChangesAsync();
-      //return PendingTransactions;
+      });
+      return pendingTransactions;
     }
   }
 }
-
-// for (int spndr = 0; spndr < Spenders.Length; spndr++)
-// {
-//   Spenders[spndr].Balance = Transfers
-//   .Where(tr => tr.ReceiverId == Spenders[spndr].Id)
-//   .Sum(transfer => transfer.Amount);
-
-//   Spenders[spndr].Balance = (-1) * Transfers
-//   .Where(tr => tr.SenderId == Spenders[spndr].Id)
-//   .Sum(transfer => transfer.Amount);
-// }

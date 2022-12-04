@@ -11,7 +11,7 @@ using SplitBackDotnet.Data;
 namespace SplitBackDotnet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221128185836_mig1")]
+    [Migration("20221204185928_mig1")]
     partial class mig1
     {
         /// <inheritdoc />
@@ -35,22 +35,6 @@ namespace SplitBackDotnet.Migrations
                     b.ToTable("GroupUser");
                 });
 
-            modelBuilder.Entity("SplitBackDotnet.Models.Currency", b =>
-                {
-                    b.Property<int>("CurrencyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("isoCode")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("CurrencyId");
-
-                    b.ToTable("Currencies");
-                });
-
             modelBuilder.Entity("SplitBackDotnet.Models.Expense", b =>
                 {
                     b.Property<int>("ExpenseId")
@@ -60,23 +44,23 @@ namespace SplitBackDotnet.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("GroupId")
+                    b.Property<int>("GroupId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("IsoCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("LabelId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ExpenseId");
-
-                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("GroupId");
 
@@ -175,6 +159,11 @@ namespace SplitBackDotnet.Migrations
                     b.Property<int>("CurrentGroupId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("IsoCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ReceiverId")
                         .HasColumnType("INTEGER");
 
@@ -221,11 +210,15 @@ namespace SplitBackDotnet.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(100)
+                        .HasMaxLength(80)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("GroupId")
+                    b.Property<int>("GroupId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("IsoCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("INTEGER");
@@ -281,21 +274,17 @@ namespace SplitBackDotnet.Migrations
 
             modelBuilder.Entity("SplitBackDotnet.Models.Expense", b =>
                 {
-                    b.HasOne("SplitBackDotnet.Models.Currency", "Currency")
+                    b.HasOne("SplitBackDotnet.Models.Group", "Group")
                         .WithMany("Expenses")
-                        .HasForeignKey("CurrencyId")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SplitBackDotnet.Models.Group", null)
-                        .WithMany("Expenses")
-                        .HasForeignKey("GroupId");
 
                     b.HasOne("SplitBackDotnet.Models.Label", "Label")
                         .WithMany()
                         .HasForeignKey("LabelId");
 
-                    b.Navigation("Currency");
+                    b.Navigation("Group");
 
                     b.Navigation("Label");
                 });
@@ -380,14 +369,13 @@ namespace SplitBackDotnet.Migrations
 
             modelBuilder.Entity("SplitBackDotnet.Models.Transfer", b =>
                 {
-                    b.HasOne("SplitBackDotnet.Models.Group", null)
+                    b.HasOne("SplitBackDotnet.Models.Group", "Group")
                         .WithMany("Transfers")
-                        .HasForeignKey("GroupId");
-                });
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("SplitBackDotnet.Models.Currency", b =>
-                {
-                    b.Navigation("Expenses");
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("SplitBackDotnet.Models.Expense", b =>

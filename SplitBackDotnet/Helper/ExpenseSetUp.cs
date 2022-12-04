@@ -28,16 +28,5 @@ namespace SplitBackDotnet.Helper
         }
       }
     }
-
-    public static void CheckTotalAmountVsTotalContributions(ICollection<Expense> Expenses, decimal TotalSpent, int e)
-    {
-      var Amount = Expenses.ElementAt(e).Amount;
-      TotalSpent += Amount;
-      decimal TotalAmountCheck = Expenses
-      .ElementAt(e)
-      .ExpenseParticipants.Where(ep => ep.ExpenseId == Expenses.ElementAt(e).ExpenseId)
-      .Sum(ep => ep.ContributionAmount.ToDecimal());
-      if (TotalAmountCheck != Amount) throw new ArgumentException($"{nameof(Amount)} is not equal to {nameof(TotalAmountCheck)}");
-    }
   }
 }

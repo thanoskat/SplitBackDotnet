@@ -11,19 +11,6 @@ namespace SplitBackDotnet.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Currencies",
-                columns: table => new
-                {
-                    CurrencyId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    isoCode = table.Column<string>(type: "TEXT", maxLength: 3, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Currencies", x => x.CurrencyId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -130,7 +117,8 @@ namespace SplitBackDotnet.Migrations
                     SenderId = table.Column<int>(type: "INTEGER", nullable: false),
                     ReceiverId = table.Column<int>(type: "INTEGER", nullable: false),
                     Amount = table.Column<decimal>(type: "TEXT", nullable: false),
-                    CurrentGroupId = table.Column<int>(type: "INTEGER", nullable: false)
+                    CurrentGroupId = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsoCode = table.Column<string>(type: "TEXT", maxLength: 3, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -149,11 +137,12 @@ namespace SplitBackDotnet.Migrations
                 {
                     TransferId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 80, nullable: true),
                     Amount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    IsoCode = table.Column<string>(type: "TEXT", nullable: false),
                     SenderId = table.Column<int>(type: "INTEGER", nullable: false),
                     ReceiverId = table.Column<int>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: true)
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -162,7 +151,8 @@ namespace SplitBackDotnet.Migrations
                         name: "FK_Transfers_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
-                        principalColumn: "GroupId");
+                        principalColumn: "GroupId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,24 +163,19 @@ namespace SplitBackDotnet.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Description = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     Amount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    IsoCode = table.Column<string>(type: "TEXT", maxLength: 3, nullable: false),
                     LabelId = table.Column<int>(type: "INTEGER", nullable: true),
-                    CurrencyId = table.Column<int>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: true)
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Expenses", x => x.ExpenseId);
                     table.ForeignKey(
-                        name: "FK_Expenses_Currencies_CurrencyId",
-                        column: x => x.CurrencyId,
-                        principalTable: "Currencies",
-                        principalColumn: "CurrencyId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Expenses_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
-                        principalColumn: "GroupId");
+                        principalColumn: "GroupId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Expenses_Labels_LabelId",
                         column: x => x.LabelId,
@@ -252,11 +237,6 @@ namespace SplitBackDotnet.Migrations
                 name: "IX_ExpenseParticipants_ParticipantId",
                 table: "ExpenseParticipants",
                 column: "ParticipantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Expenses_CurrencyId",
-                table: "Expenses",
-                column: "CurrencyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_GroupId",
@@ -333,9 +313,6 @@ namespace SplitBackDotnet.Migrations
 
             migrationBuilder.DropTable(
                 name: "Expenses");
-
-            migrationBuilder.DropTable(
-                name: "Currencies");
 
             migrationBuilder.DropTable(
                 name: "Labels");

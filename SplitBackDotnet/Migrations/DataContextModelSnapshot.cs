@@ -74,9 +74,7 @@ namespace SplitBackDotnet.Migrations
                     b.Property<int>("ParticipantId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ContributionAmount")
-                        .IsRequired()
-                        .HasMaxLength(30)
+                    b.Property<decimal>("ContributionAmount")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ExpenseId", "ParticipantId");
@@ -94,9 +92,7 @@ namespace SplitBackDotnet.Migrations
                     b.Property<int>("SpenderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("SpenderAmount")
-                        .IsRequired()
-                        .HasMaxLength(30)
+                    b.Property<decimal>("SpenderAmount")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ExpenseId", "SpenderId");
@@ -146,31 +142,6 @@ namespace SplitBackDotnet.Migrations
                     b.HasIndex("GroupId");
 
                     b.ToTable("Labels");
-                });
-
-            modelBuilder.Entity("SplitBackDotnet.Models.PendingTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CurrentGroupId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentGroupId");
-
-                    b.ToTable("PendingTransactions");
                 });
 
             modelBuilder.Entity("SplitBackDotnet.Models.Session", b =>
@@ -341,17 +312,6 @@ namespace SplitBackDotnet.Migrations
                         .HasForeignKey("GroupId");
                 });
 
-            modelBuilder.Entity("SplitBackDotnet.Models.PendingTransaction", b =>
-                {
-                    b.HasOne("SplitBackDotnet.Models.Group", "Group")
-                        .WithMany("PendingTransactions")
-                        .HasForeignKey("CurrentGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-                });
-
             modelBuilder.Entity("SplitBackDotnet.Models.Session", b =>
                 {
                     b.HasOne("SplitBackDotnet.Models.User", "User")
@@ -386,8 +346,6 @@ namespace SplitBackDotnet.Migrations
                     b.Navigation("Expenses");
 
                     b.Navigation("Labels");
-
-                    b.Navigation("PendingTransactions");
 
                     b.Navigation("Transfers");
                 });

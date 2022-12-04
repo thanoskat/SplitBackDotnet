@@ -8,11 +8,14 @@ namespace SplitBackDotnet.Data
   public class Repo : IRepo
   {
     private readonly DataContext _context;
+    //private readonly IMapper _mapper;
 
-    public Repo(DataContext context)
+    public Repo(DataContext context, IMapper mapper)
     {
       _context = context;
+      //_mapper = mapper;
     }
+    
     public async Task<Group?> GetGroupById(int groupId)
     {
       //return await _context.Groups.Include(group => group.Expenses).FirstOrDefaultAsync(group => group.Id == groupId);
@@ -21,7 +24,6 @@ namespace SplitBackDotnet.Data
       .Include(group => group.Members)
       .Include(group => group.Expenses)
       .Include(group => group.Transfers)
-      .Include(group => group.PendingTransactions)
       .Include(group => group.Expenses).ThenInclude(exp => exp.ExpenseParticipants)
       .Include(group => group.Expenses).ThenInclude(exp => exp.ExpenseSpenders)
       .FirstOrDefaultAsync(group => group.GroupId == groupId);
@@ -43,7 +45,7 @@ namespace SplitBackDotnet.Data
       await _context.AddAsync(label);
     }
 
-    public async Task AddNewExpense(NewExpenseDto newExpenseDto, IMapper mapper)
+    public async Task AddNewExpense(IMapper mapper, NewExpenseDto newExpenseDto)
     {
       var newExpense = mapper.Map<Expense>(newExpenseDto);
       await _context.AddAsync<Expense>(newExpense);

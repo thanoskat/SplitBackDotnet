@@ -11,8 +11,8 @@ using SplitBackDotnet.Data;
 namespace SplitBackDotnet.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221202170012_mig6")]
-    partial class mig6
+    [Migration("20221204190052_mig2")]
+    partial class mig2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,9 +77,7 @@ namespace SplitBackDotnet.Migrations
                     b.Property<int>("ParticipantId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ContributionAmount")
-                        .IsRequired()
-                        .HasMaxLength(30)
+                    b.Property<decimal>("ContributionAmount")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ExpenseId", "ParticipantId");
@@ -97,9 +95,7 @@ namespace SplitBackDotnet.Migrations
                     b.Property<int>("SpenderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("SpenderAmount")
-                        .IsRequired()
-                        .HasMaxLength(30)
+                    b.Property<decimal>("SpenderAmount")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ExpenseId", "SpenderId");
@@ -163,6 +159,14 @@ namespace SplitBackDotnet.Migrations
                     b.Property<int>("CurrentGroupId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("GroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("IsoCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ReceiverId")
                         .HasColumnType("INTEGER");
 
@@ -171,9 +175,9 @@ namespace SplitBackDotnet.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CurrentGroupId");
+                    b.HasIndex("GroupId");
 
-                    b.ToTable("PendingTransactions");
+                    b.ToTable("PendingTransaction");
                 });
 
             modelBuilder.Entity("SplitBackDotnet.Models.Session", b =>
@@ -214,6 +218,10 @@ namespace SplitBackDotnet.Migrations
 
                     b.Property<int>("GroupId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("IsoCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("INTEGER");
@@ -344,7 +352,7 @@ namespace SplitBackDotnet.Migrations
                 {
                     b.HasOne("SplitBackDotnet.Models.Group", "Group")
                         .WithMany("PendingTransactions")
-                        .HasForeignKey("CurrentGroupId")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

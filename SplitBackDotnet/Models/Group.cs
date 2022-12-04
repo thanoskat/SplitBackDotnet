@@ -14,5 +14,4 @@ public class Group
   public ICollection<Expense>? Expenses { get; set; } = new List<Expense>();
   public ICollection<Transfer>? Transfers { get; set; } = new List<Transfer>();
   public ICollection<Label>? Labels { get; set; } = new List<Label>();
-  public ICollection<PendingTransaction>? PendingTransactions { get; set; } = new List<PendingTransaction>();
 }
