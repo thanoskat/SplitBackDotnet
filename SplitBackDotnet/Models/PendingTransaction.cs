@@ -10,4 +10,3 @@ public class PendingTransaction {
 
   public string IsoCode { get; set; } = null!;
 }
-
