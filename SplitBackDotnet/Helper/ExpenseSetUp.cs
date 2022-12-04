@@ -2,7 +2,7 @@ using SplitBackDotnet.Dtos;
 using NMoneys.Allocations;
 using NMoneys.Extensions;
 using SplitBackDotnet.Models;
-using SplitBackDotnet.Extentions;
+using SplitBackDotnet.Extensions;
 using NMoneys;
 
 namespace SplitBackDotnet.Helper
