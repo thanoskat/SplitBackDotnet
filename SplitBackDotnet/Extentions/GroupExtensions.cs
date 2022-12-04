@@ -5,7 +5,7 @@ namespace SplitBackDotnet.Helper {
 
   public static class GroupExtensions {
 
-    public static List<PendingTransaction> PendingTransactions(this Group group, IRepo repo, DataContext context) {
+    public static List<PendingTransaction> PendingTransactions(this Group group) {
 
       var expenseListsByIsoCode = group.Expenses.GroupBy(exp => exp.IsoCode);
       var transferListsByIsoCode = group.Transfers.GroupBy(tr => tr.IsoCode);

@@ -8,14 +8,13 @@ namespace SplitBackDotnet.Data
   public class Repo : IRepo
   {
     private readonly DataContext _context;
-    //private readonly IMapper _mapper;
+    private readonly IMapper _mapper;
 
-    public Repo(DataContext context, IMapper mapper)
+    public Repo(DataContext context)
     {
       _context = context;
-      //_mapper = mapper;
     }
-    
+
     public async Task<Group?> GetGroupById(int groupId)
     {
       //return await _context.Groups.Include(group => group.Expenses).FirstOrDefaultAsync(group => group.Id == groupId);
@@ -45,17 +44,17 @@ namespace SplitBackDotnet.Data
       await _context.AddAsync(label);
     }
 
-    public async Task AddNewExpense(IMapper mapper, NewExpenseDto newExpenseDto)
+    public async Task AddNewExpense(NewExpenseDto newExpenseDto)
     {
-      var newExpense = mapper.Map<Expense>(newExpenseDto);
+      var newExpense = _mapper.Map<Expense>(newExpenseDto);
       await _context.AddAsync<Expense>(newExpense);
       await SaveChangesAsync();
 
     }
 
-    public async Task AddNewTransfer(NewTransferDto newTransferDto, IMapper mapper)
+    public async Task AddNewTransfer(NewTransferDto newTransferDto)
     {
-      var newTransfer = mapper.Map<Transfer>(newTransferDto);
+      var newTransfer = _mapper.Map<Transfer>(newTransferDto);
       await _context.AddAsync<Transfer>(newTransfer);
       await SaveChangesAsync();
     }
