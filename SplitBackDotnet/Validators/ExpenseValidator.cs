@@ -2,7 +2,9 @@ using FluentValidation;
 using SplitBackDotnet.Dtos;
 using SplitBackDotnet.Extensions;
 using NMoneys;
+
 public class ExpenseValidator : AbstractValidator<NewExpenseDto> {
+
   public ExpenseValidator() {
 
     RuleFor(newExpense => newExpense.IsoCode)
