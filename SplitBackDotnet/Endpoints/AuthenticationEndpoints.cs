@@ -115,7 +115,7 @@ public static class AuthenticationEndpoints {
         Subject = new ClaimsIdentity(new[] {
           new Claim("userId", sessionFound.User.UserId.ToString())
         }),
-        Expires = DateTime.Now.AddMinutes(1),
+        Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],
         Issuer = config["Jwt:Issuer"],
         SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512)
@@ -154,7 +154,7 @@ public static class AuthenticationEndpoints {
           new Claim("nickname", userCreateDto.Nickname.ToString()),
           new Claim("unique", unique),
         }),
-        Expires = DateTime.Now.AddMinutes(1),
+        Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],
         Issuer = config["Jwt:Issuer"],
         SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512)
@@ -191,7 +191,7 @@ public static class AuthenticationEndpoints {
           new Claim("email", emailBody.Email.ToString()),
           new Claim("unique", unique),
         }),
-        Expires = DateTime.Now.AddMinutes(1),
+        Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],
         Issuer = config["Jwt:Issuer"],
         SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512)
@@ -228,7 +228,7 @@ public static class AuthenticationEndpoints {
         Subject = new ClaimsIdentity(new[] {
           new Claim("userId", sessionFound.User.UserId.ToString())
         }),
-        Expires = DateTime.Now.AddMinutes(1),
+        Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],
         Issuer = config["Jwt:Issuer"],
         SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512)

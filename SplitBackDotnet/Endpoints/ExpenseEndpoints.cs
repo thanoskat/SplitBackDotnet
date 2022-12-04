@@ -20,6 +20,7 @@ public static class ExpenseEndpoints
       PreGroupSetUp.AddCreatorToMembers(context, httpContext, group);
       await repo.CreateGroup(group);
       await repo.SaveChangesAsync();
+      return Results.Ok();
     });
 
     app.MapPost("/addExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) =>
