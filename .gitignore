@@ -355,7 +355,7 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
-/SplitBackDotnet/Migrations
+
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
@@ -365,4 +365,5 @@ FodyWeavers.xsd
 /SplitBackDotnet/appsettings.Development.json
 /SplitBackDotnet/mydatabase.db-shm
 /SplitBackDotnet/mydatabase.db-wal
+/SplitBackDotnet/Migrations/*
 
