@@ -4,9 +4,7 @@ using SplitBackDotnet.Dtos;
 using AutoMapper;
 using SplitBackDotnet.Helper;
 using Microsoft.AspNetCore.Authorization;
-using NMoneys;
-using NMoneys.Allocations;
-using NMoneys.Extensions;
+using SplitBackDotnet.Extensions;
 
 namespace SplitBackDotnet.Endpoints;
 
@@ -16,14 +14,26 @@ public static class ExpenseEndpoints
   {
     app.MapPost("/creategroup", [Authorize] async (HttpContext httpContext, IRepo repo, IMapper mapper, DataContext context, CreateGroupDto createGroupDto) =>
     {
-      var group = mapper.Map<Group>(createGroupDto);
-      PreGroupSetUp.AddCreatorToMembers(context, httpContext, group);
-      await repo.CreateGroup(group);
-      await repo.SaveChangesAsync();
-      return Results.Ok();
+      try {
+        var authedUserId = httpContext.GetAuthorizedUserId();
+        var group = mapper.Map<Group>(createGroupDto);
+        
+        var newCreator = new User{ UserId = authedUserId };
+        context.Attach<User>(newCreator);
+
+        group.AddAsCreatorAndMember(newCreator);
+
+        await repo.CreateGroup(group);
+        await repo.SaveChangesAsync();
+
+        return Results.Ok();
+      }
+      catch(Exception ex) {
+        return Results.BadRequest(ex.Message);
+      }
     });
 
-    app.MapPost("/addExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) =>
+    app.MapPost("/addExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
     {
       try
       {
@@ -41,10 +51,8 @@ public static class ExpenseEndpoints
         await repo.AddNewExpense(newExpenseDto);
 
         var group = await repo.GetGroupById(newExpenseDto.GroupId);
-        if(group == null) throw new Exception();
-
+        if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());
-
       }
       catch (Exception ex)
       {
@@ -52,8 +60,7 @@ public static class ExpenseEndpoints
       }
     });
 
-
-    app.MapPost("/addTransfer", async (IRepo repo, IMapper mapper, DataContext context, NewTransferDto newTransferDto) =>
+    app.MapPost("/addTransfer", async (IRepo repo, NewTransferDto newTransferDto) =>
     {
       try
       {
@@ -67,10 +74,10 @@ public static class ExpenseEndpoints
             Field = x.PropertyName
           }));
         }
-        var Group = await repo.GetGroupById(newTransferDto.GroupId);
         await repo.AddNewTransfer(newTransferDto);
-        //CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
-        return Results.Ok();
+        var group = await repo.GetGroupById(newTransferDto.GroupId);
+        if (group is null) throw new Exception();
+        return Results.Ok(group.PendingTransactions());
       }
       catch (Exception ex)
       {

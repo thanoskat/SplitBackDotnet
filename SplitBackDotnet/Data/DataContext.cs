@@ -22,7 +22,7 @@ public class DataContext : DbContext
   {
     modelBuilder.Entity<User>().HasIndex(user => user.Email).IsUnique();
     modelBuilder.Entity<User>().HasMany(user => user.Groups).WithMany(group => group.Members);
-    modelBuilder.Entity<Group>().HasOne(group => group.Creator).WithMany(user => user.CreatedGroups);
+    //modelBuilder.Entity<Group>().HasOne(group => group.Creator).WithMany(user => user.CreatedGroups);
 
     //Start of ExpenseSpender
     //https://www.entityframeworktutorial.net/efcore/configure-many-to-many-relationship-in-ef-core.aspx
@@ -65,9 +65,12 @@ public class DataContext : DbContext
     modelBuilder.Entity<Group>()
     .HasMany<Transfer>(g => g.Transfers)
     .WithOne(t => t.Group)
-    .HasForeignKey(e => e.GroupId)
+    .HasForeignKey(t => t.GroupId)
     .OnDelete(DeleteBehavior.Cascade);
 
-    
+    modelBuilder.Entity<User>()
+    .HasMany<Group>(u => u.CreatedGroups)
+    .WithOne(g => g.Creator)
+    .HasForeignKey(g => g.CreatorId);
   }
 }

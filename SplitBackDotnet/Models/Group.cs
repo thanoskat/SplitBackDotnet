@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace SplitBackDotnet.Models;
 
-public class Group {
+public class Group
+{
 
   public int GroupId { get; set; }
 
@@ -11,6 +12,8 @@ public class Group {
 
   [Required]
   public User Creator { get; set; } = new User();
+
+  public int CreatorId { get; set; }
 
   [Required]
   public ICollection<User> Members { get; set; } = new List<User>();
