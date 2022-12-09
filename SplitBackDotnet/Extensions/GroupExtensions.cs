@@ -371,7 +371,7 @@ public static class GroupExtensions
         txEntryByIsoCodeList[1].TotalBorrowed = txEntryByIsoCodeList[0].Borrowed + txEntryByIsoCodeList[1].Borrowed;
         txEntryByIsoCodeList[1].Balance = txEntryByIsoCodeList[1].Lent - txEntryByIsoCodeList[1].Borrowed;
 
-        for (int i = 1; i < txEntryByIsoCodeList.Count; i++)
+        for (int i = 2; i < txEntryByIsoCodeList.Count; i++)
         {
           txEntryByIsoCodeList[i].TotalLent = txEntryByIsoCodeList[i - 1].TotalLent + txEntryByIsoCodeList[i].Lent;
           txEntryByIsoCodeList[i].TotalBorrowed = txEntryByIsoCodeList[i - 1].TotalBorrowed + txEntryByIsoCodeList[i].Borrowed;
