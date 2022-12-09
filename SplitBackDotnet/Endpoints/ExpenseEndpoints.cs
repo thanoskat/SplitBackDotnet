@@ -85,13 +85,13 @@ public static class ExpenseEndpoints
 
     app.MapPost("/txHistory", async (IRepo repo, TransactionHistoryDto txHistoryDto) =>
     {
-      
       try
       {
         var group = await repo.GetGroupById(txHistoryDto.GroupId.ToInt());
+        if (group is null) throw new Exception();
         if (group.Expenses.Count == 0)
         {
-          return Results.Ok();
+          return Results.Ok(new List<HistoricalTransaction>());
         }
         return Results.Ok(group.GetTransactionHistory());
       }
@@ -99,8 +99,6 @@ public static class ExpenseEndpoints
       {
         return Results.BadRequest(ex.InnerException);
       }
-
-
     });
   }
 }

@@ -48,6 +48,8 @@ app.UseHttpsRedirection();
 app.MapGet("/", () => "Welcome to SplitBackMinimal Api").WithName("SplitBackMinimal Api");
 app.MapUserEndpoints();
 app.MapExpenseEndpoints();
+app.MapTransferEndpoints();
+app.MapGroupEndpoints();
 app.MapAuthenticationEndpoints();
 
 app.UseCors("AllowAllPolicy");

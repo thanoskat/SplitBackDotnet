@@ -51,12 +51,6 @@ public class DataContext : DbContext
     .HasForeignKey(s => s.ParticipantId);
     //End of Share
 
-    // modelBuilder.Entity<Group>()
-    // .HasMany<PendingTransaction>(g => g.PendingTransactions)
-    // .WithOne(pt => pt.Group)
-    // .HasForeignKey(pt => pt.CurrentGroupId)
-    // .OnDelete(DeleteBehavior.Cascade);
-
     modelBuilder.Entity<Group>()
     .HasMany<Expense>(g => g.Expenses)
     .WithOne(e => e.Group)
