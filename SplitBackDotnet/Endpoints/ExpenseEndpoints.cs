@@ -10,29 +10,22 @@ using NMoneys.Extensions;
 
 namespace SplitBackDotnet.Endpoints;
 
-public static class ExpenseEndpoints
-{
-  public static void MapExpenseEndpoints(this IEndpointRouteBuilder app)
-  {
-    app.MapPost("/creategroup", [Authorize] async (HttpContext httpContext, IRepo repo, IMapper mapper, DataContext context, CreateGroupDto createGroupDto) =>
-    {
+public static class ExpenseEndpoints {
+  public static void MapExpenseEndpoints(this IEndpointRouteBuilder app) {
+    app.MapPost("/creategroup", [Authorize] async (HttpContext httpContext, IRepo repo, IMapper mapper, DataContext context, CreateGroupDto createGroupDto) => {
       var group = mapper.Map<Group>(createGroupDto);
       PreGroupSetUp.AddCreatorToMembers(context, httpContext, group);
       await repo.CreateGroup(group);
       await repo.SaveChangesAsync();
       return Results.Ok();
-    });
+    }).RequireAuthorization();
 
-    app.MapPost("/addExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) =>
-    {
-      try
-      {
+    app.MapPost("/addExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) => {
+      try {
         var expenseValidator = new ExpenseValidator();
         var validationResult = expenseValidator.Validate(newExpenseDto);
-        if (validationResult.Errors.Count > 0)
-        {
-          return Results.Ok(validationResult.Errors.Select(x => new
-          {
+        if(validationResult.Errors.Count > 0) {
+          return Results.Ok(validationResult.Errors.Select(x => new {
             Message = x.ErrorMessage,
             Field = x.PropertyName
           }));
@@ -45,24 +38,40 @@ public static class ExpenseEndpoints
 
         return Results.Ok(group.PendingTransactions());
 
-      }
-      catch (Exception ex)
-      {
+      } catch(Exception ex) {
         return Results.BadRequest(ex.Message);
       }
     });
 
+    app.MapPost("/editExpense", async (IRepo repo, IMapper mapper, DataContext context, NewExpenseDto newExpenseDto) => {
+      try {
+        var expenseValidator = new ExpenseValidator();
+        var validationResult = expenseValidator.Validate(newExpenseDto);
+        if(validationResult.Errors.Count > 0) {
+          return Results.Ok(validationResult.Errors.Select(x => new {
+            Message = x.ErrorMessage,
+            Field = x.PropertyName
+          }));
+        }
+        ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
+        await repo.EditExpense(newExpenseDto);
 
-    app.MapPost("/addTransfer", async (IRepo repo, IMapper mapper, DataContext context, NewTransferDto newTransferDto) =>
-    {
-      try
-      {
+        var group = await repo.GetGroupById(newExpenseDto.GroupId);
+        if(group == null) throw new Exception();
+
+        return Results.Ok(group.PendingTransactions());
+
+      } catch(Exception ex) {
+        return Results.BadRequest(ex.Message);
+      }
+    });
+
+    app.MapPost("/addTransfer", async (IRepo repo, IMapper mapper, DataContext context, NewTransferDto newTransferDto) => {
+      try {
         var transferValidator = new TransferValidator();
         var validationResult = transferValidator.Validate(newTransferDto);
-        if (validationResult.Errors.Count > 0)
-        {
-          return Results.Ok(validationResult.Errors.Select(x => new
-          {
+        if(validationResult.Errors.Count > 0) {
+          return Results.Ok(validationResult.Errors.Select(x => new {
             Message = x.ErrorMessage,
             Field = x.PropertyName
           }));
@@ -71,9 +80,7 @@ public static class ExpenseEndpoints
         await repo.AddNewTransfer(newTransferDto);
         //CalcPending.PendingTransactions(Group?.Expenses!, Group?.Transfers!, Group?.Members!, Group!, repo, context);
         return Results.Ok();
-      }
-      catch (Exception ex)
-      {
+      } catch(Exception ex) {
         return Results.BadRequest(ex.Message);
       }
     });

@@ -50,6 +50,14 @@ public class Repo : IRepo {
     await SaveChangesAsync();
   }
 
+  public async Task EditExpense(NewExpenseDto newExpenseDto) {
+
+    var newExpense = _mapper.Map<Expense>(newExpenseDto);
+    newExpense.ExpenseId = 1;
+    _context.Expenses.Update(newExpense);
+    await SaveChangesAsync();
+  }
+
   public async Task AddNewTransfer(NewTransferDto newTransferDto) {
 
     var newTransfer = _mapper.Map<Transfer>(newTransferDto);

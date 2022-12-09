@@ -13,6 +13,8 @@ public interface IRepo {
 
   Task AddNewExpense(NewExpenseDto newExpenseDto);
 
+  Task EditExpense(NewExpenseDto newExpenseDto);
+
   Task AddNewTransfer(NewTransferDto newTransferDto);
 
   Task<Group?> GetGroupById(int groupId);
