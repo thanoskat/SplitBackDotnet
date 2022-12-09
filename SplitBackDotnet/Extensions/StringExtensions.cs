@@ -13,6 +13,17 @@ public static class StringExtensions {
     }
   }
 
+    public static int ToInt(this string str) {
+
+    bool successfullyParsed = int.TryParse(str, out int x);
+
+    if(successfullyParsed) {
+      return x;
+    } else {
+      throw new Exception();
+    }
+  }
+
   public static bool CheckIfDecimal(this string str) {
 
     bool successfullyParsed = decimal.TryParse(str, out decimal x);

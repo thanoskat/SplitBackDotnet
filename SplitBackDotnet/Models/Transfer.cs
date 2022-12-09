@@ -11,4 +11,5 @@ public class Transfer
   public int ReceiverId { get; set; }
   public Group Group { get; set; } = null!;
   public int GroupId { get; set; }
+  public DateTime CreatedAt {get;set;}
 }

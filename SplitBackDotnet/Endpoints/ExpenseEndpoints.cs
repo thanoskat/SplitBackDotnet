@@ -12,27 +12,6 @@ public static class ExpenseEndpoints
 {
   public static void MapExpenseEndpoints(this IEndpointRouteBuilder app)
   {
-    app.MapPost("/creategroup", [Authorize] async (HttpContext httpContext, IRepo repo, IMapper mapper, DataContext context, CreateGroupDto createGroupDto) =>
-    {
-      try {
-        var authedUserId = httpContext.GetAuthorizedUserId();
-        var group = mapper.Map<Group>(createGroupDto);
-        
-        var newCreator = new User{ UserId = authedUserId };
-        context.Attach<User>(newCreator);
-
-        group.AddAsCreatorAndMember(newCreator);
-
-        await repo.CreateGroup(group);
-        await repo.SaveChangesAsync();
-
-        return Results.Ok();
-      }
-      catch(Exception ex) {
-        return Results.BadRequest(ex.Message);
-      }
-    });
-
     app.MapPost("/addExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
     {
       try
@@ -60,22 +39,39 @@ public static class ExpenseEndpoints
       }
     });
 
-    app.MapPost("/addTransfer", async (IRepo repo, NewTransferDto newTransferDto) =>
+    app.MapPost("/editExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
+       {
+         try
+         {
+           var expenseValidator = new ExpenseValidator();
+           var validationResult = expenseValidator.Validate(newExpenseDto);
+           if (validationResult.Errors.Count > 0)
+           {
+             return Results.Ok(validationResult.Errors.Select(x => new
+             {
+               Message = x.ErrorMessage,
+               Field = x.PropertyName
+             }));
+           }
+           ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
+           await repo.EditExpense(newExpenseDto);
+
+           var group = await repo.GetGroupById(newExpenseDto.GroupId);
+           if (group is null) throw new Exception();
+           return Results.Ok(group.PendingTransactions());
+         }
+         catch (Exception ex)
+         {
+           return Results.BadRequest(ex.Message);
+         }
+       });
+
+    app.MapPost("/removeExpense", async (IRepo repo, RemoveExpenseDto removeExpenseDto) =>
     {
       try
       {
-        var transferValidator = new TransferValidator();
-        var validationResult = transferValidator.Validate(newTransferDto);
-        if (validationResult.Errors.Count > 0)
-        {
-          return Results.Ok(validationResult.Errors.Select(x => new
-          {
-            Message = x.ErrorMessage,
-            Field = x.PropertyName
-          }));
-        }
-        await repo.AddNewTransfer(newTransferDto);
-        var group = await repo.GetGroupById(newTransferDto.GroupId);
+        var group = await repo.GetGroupById(removeExpenseDto.GroupId.ToInt());
+        await repo.RemoveExpense(removeExpenseDto);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());
       }
@@ -83,6 +79,28 @@ public static class ExpenseEndpoints
       {
         return Results.BadRequest(ex.Message);
       }
+    });
+
+
+
+    app.MapPost("/txHistory", async (IRepo repo, TransactionHistoryDto txHistoryDto) =>
+    {
+      
+      try
+      {
+        var group = await repo.GetGroupById(txHistoryDto.GroupId.ToInt());
+        if (group.Expenses.Count == 0)
+        {
+          return Results.Ok();
+        }
+        return Results.Ok(group.GetTransactionHistory());
+      }
+      catch (Exception ex)
+      {
+        return Results.BadRequest(ex.InnerException);
+      }
+
+
     });
   }
 }

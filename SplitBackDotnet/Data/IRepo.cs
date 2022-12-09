@@ -3,7 +3,8 @@ using SplitBackDotnet.Dtos;
 
 namespace SplitBackDotnet.Data;
 
-public interface IRepo {
+public interface IRepo
+{
 
   Task SaveChangesAsync();
 
@@ -12,6 +13,12 @@ public interface IRepo {
   Task AddLabel(Label label);
 
   Task AddNewExpense(NewExpenseDto newExpenseDto);
+
+  Task EditExpense(NewExpenseDto newExpenseDto);
+  
+  Task RemoveExpense(RemoveExpenseDto removeExpenseDto);
+
+  Task RemoveTransfer(RemoveTransferDto removeTransferDto);
 
   Task AddNewTransfer(NewTransferDto newTransferDto);
 

@@ -1,0 +1,29 @@
+{
+  "groupId": 2,
+  "description": "mapogk",
+  "amount": "25",
+  "splitEqually": false,
+  "isoCode": "GBP",
+  "label": {
+    "name": "string"
+  },
+  "expenseParticipants": [
+    {
+      "participantId": "1",
+      "contributionAmount": "8"
+    },
+{
+      "participantId": "3",
+      "contributionAmount": "7"
+    },{
+      "participantId": "4",
+      "contributionAmount": "10"
+    }
+  ],
+  "expenseSpenders": [
+    {
+      "spenderId": "3",
+      "spenderAmount": "25"
+    }
+  ]
+}

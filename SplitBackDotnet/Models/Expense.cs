@@ -18,4 +18,5 @@ public class Expense
   public ICollection<ExpenseParticipant> ExpenseParticipants { get; set; } = new List<ExpenseParticipant>();
   public Group Group { get; set; } = null!;
   public int GroupId { get; set; }
+  public DateTime CreatedAt {get;set;}
 }
