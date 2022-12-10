@@ -91,7 +91,7 @@ public static class ExpenseEndpoints
         if (group is null) throw new Exception();
         if (group.Expenses.Count == 0)
         {
-          return Results.Ok(new List<HistoricalTransaction>());
+          return Results.Ok(new List<TransactionTimelineItem>());
         }
         return Results.Ok(group.GetTransactionHistory());
       }
