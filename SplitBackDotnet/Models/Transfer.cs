@@ -4,7 +4,7 @@ public class Transfer
 {
   public int TransferId { get; set; }
   [MaxLength(80)]
-  public string? Description { get; set; }
+  public string Description { get; set; } = String.Empty;
   public decimal Amount { get; set; }
   public string IsoCode { get; set; } = null!;
   public int SenderId { get; set; }

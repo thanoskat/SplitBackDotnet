@@ -16,7 +16,6 @@
     "NewLineForCatch": false,
     "NewLineForFinally": false,
     "NewLineForMembersInObjectInit": false,
-
     "SpaceAfterControlFlowStatementKeyword": false
   }
 }

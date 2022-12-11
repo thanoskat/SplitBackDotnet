@@ -93,7 +93,7 @@ public static class ExpenseEndpoints
         {
           return Results.Ok(new List<TransactionTimelineItem>());
         }
-        return Results.Ok(group.GetTransactionHistory());
+        return Results.Ok(group.ToTimelineByUserId(3));
       }
       catch (Exception ex)
       {

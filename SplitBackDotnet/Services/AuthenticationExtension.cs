@@ -18,7 +18,7 @@ public static class AuthenticationExtension {
         ValidIssuer = config["Jwt:Issuer"],
         ValidAudience = config["Jwt:Audience"],
         ValidateAudience = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"] ?? "lala")),
         ValidateLifetime = true, // In any other application other then dem o this needs to be true,
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero

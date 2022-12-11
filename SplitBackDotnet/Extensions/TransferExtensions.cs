@@ -5,8 +5,10 @@ namespace SplitBackDotnet.Extensions;
 public static class TransferExtensions
 {
 
-  public static TransactionMemberDetail? ToTransactionMemberDetailFromUserId(this Transfer transfer, int userId)
+  public static TransactionMemberStats? ToTransactionMemberStatsFromUserId(this Transfer transfer, int userId)
   {
+    if(transfer is null) return null;
+    
     var isSender = transfer.SenderId == userId;
     var isReceiver = transfer.ReceiverId == userId;
     decimal lent = 0;
@@ -24,7 +26,7 @@ public static class TransferExtensions
       borrowed = transfer.Amount;
     }
 
-    return new TransactionMemberDetail {
+    return new TransactionMemberStats {
       TransactionId = transfer.TransferId,
       CreatedAt = transfer.CreatedAt,
       Description = transfer.Description,

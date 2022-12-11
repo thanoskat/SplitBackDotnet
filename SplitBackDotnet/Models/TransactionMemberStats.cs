@@ -1,6 +1,6 @@
 namespace SplitBackDotnet.Models;
 
-public class TransactionMemberDetail
+public class TransactionMemberStats
 {
   public int TransactionId { get; set; }
 

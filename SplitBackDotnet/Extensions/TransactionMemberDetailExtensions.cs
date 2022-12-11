@@ -2,25 +2,25 @@ using SplitBackDotnet.Models;
 
 namespace SplitBackDotnet.Extensions;
 
-public static class TransactionMemberDetailExtensions
+public static class TransactionMemberStatsExtension
 {
 
   public static TransactionTimelineItem ToTransactionTimelineItem(
-    this TransactionMemberDetail transactionMemberDetail,
+    this TransactionMemberStats transactionMemberStats,
     decimal totalLentSoFar,
     decimal totalBorrowedSoFar)
   {
     return new TransactionTimelineItem
     {
-      TransactionId = transactionMemberDetail.TransactionId,
-      CreatedAt = transactionMemberDetail.CreatedAt,
-      Description = transactionMemberDetail.Description,
-      Lent = transactionMemberDetail.Lent,
-      Borrowed = transactionMemberDetail.Borrowed,
-      UserPaid = transactionMemberDetail.UserPaid,
-      UserShare = transactionMemberDetail.UserShare,
-      IsTransfer = transactionMemberDetail.IsTransfer,
-      IsoCode = transactionMemberDetail.IsoCode,
+      TransactionId = transactionMemberStats.TransactionId,
+      CreatedAt = transactionMemberStats.CreatedAt,
+      Description = transactionMemberStats.Description,
+      Lent = transactionMemberStats.Lent,
+      Borrowed = transactionMemberStats.Borrowed,
+      UserPaid = transactionMemberStats.UserPaid,
+      UserShare = transactionMemberStats.UserShare,
+      IsTransfer = transactionMemberStats.IsTransfer,
+      IsoCode = transactionMemberStats.IsoCode,
 
       TotalLent = totalLentSoFar,
       TotalBorrowed = totalBorrowedSoFar,

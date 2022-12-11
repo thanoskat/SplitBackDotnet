@@ -17,7 +17,7 @@ public static class AuthenticationEndpoints {
 
     app.MapPost("/auth/verify-token", async (HttpResponse response, IConfiguration config, DataContext context, [FromBody] TokenBody tokenBody) => {
       var tokenHandler = new JwtSecurityTokenHandler();
-      var key = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
+      var key = Encoding.UTF8.GetBytes(config["Jwt:Key"] ?? "lala");
 
       try {
         tokenHandler.ValidateToken(tokenBody.Token, new TokenValidationParameters {
@@ -106,7 +106,7 @@ public static class AuthenticationEndpoints {
         MaxAge = TimeSpan.FromDays(30)
       });
 
-      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
+      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"] ?? "lala");
       var securityKey = new SymmetricSecurityKey(secureKey);
       var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
       var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -142,7 +142,7 @@ public static class AuthenticationEndpoints {
 
       var unique = Guid.NewGuid().ToString();
 
-      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
+      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"] ?? "lala");
       var securityKey = new SymmetricSecurityKey(secureKey);
       var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
       var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -180,7 +180,7 @@ public static class AuthenticationEndpoints {
 
       var unique = Guid.NewGuid().ToString();
 
-      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
+      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"] ?? "lala");
       var securityKey = new SymmetricSecurityKey(secureKey);
       var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
       var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -219,7 +219,7 @@ public static class AuthenticationEndpoints {
       var sessionFound = await context.Sessions.Include(session => session.User).FirstOrDefaultAsync(session => session.RefreshToken == refreshToken);
       if(sessionFound == null) return Results.BadRequest();
 
-      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
+      var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"] ?? "lala");
       var securityKey = new SymmetricSecurityKey(secureKey);
       var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
       var jwtTokenHandler = new JwtSecurityTokenHandler();

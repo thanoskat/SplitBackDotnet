@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using SplitBackDotnet.Data;
@@ -9,25 +8,35 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<JsonOptions>(options => {
-  options.SerializerOptions.AllowTrailingCommas = true;
-  options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Prevent reference loop
+    options.SerializerOptions.AllowTrailingCommas = true;
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Prevent reference loop
 });
 
 builder.Services.AddDbContext<DataContext>(options =>
   options.UseSqlite(@"DataSource=mydatabase.db;")
  );
 
+// builder.Services.AddSingleton<IDocumentStore>(new DocumentStore {
+//     Urls = new[] { "http://localhost:8080" },
+//     Database = "splita"
+// });
+
+// builder.Services.AddScoped<IDocumentSession>(provider => {
+//     var store = provider.GetService<IDocumentStore>();
+//     store.Initialize();
+//     return store.OpenSession();
+// });
 
 builder.Services.AddScoped<IRepo, Repo>();
 builder.Services.AddCors(options => {
-  options.AddPolicy("AllowAllPolicy",
-  builder => {
-    builder
-      .WithOrigins(new[] { "http://localhost:3000" })
-      .AllowAnyMethod()
-      .AllowAnyHeader()
-      .AllowCredentials();
-  });
+    options.AddPolicy("AllowAllPolicy",
+    builder => {
+        builder
+        .WithOrigins(new[] { "http://localhost:3000" })
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -37,10 +46,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddMySwagger();
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-  app.UseSwagger();
-  app.UseSwaggerUI();
+if(app.Environment.IsDevelopment()) {
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 app.UseAuthentication();
 app.UseAuthorization();

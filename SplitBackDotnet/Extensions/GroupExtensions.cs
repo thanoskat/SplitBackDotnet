@@ -132,53 +132,52 @@ public static class GroupExtensions
     group.Creator = user;
   }
 
-  public static Dictionary<string, List<TransactionTimelineItem>> GetTransactionHistory(this Group group)
+  public static Dictionary<string, List<TransactionTimelineItem>> ToTimelineByUserId(this Group group, int userId)
   {
-    var userId = 3;
     var uniqueIsoCodeList = group.UniqueCurrencyCodes();
     var transactionTimelineForEachCurrency = new Dictionary<string, List<TransactionTimelineItem>>();
 
     // Loop currencies used
     foreach (var currencyCode in uniqueIsoCodeList)
     {
-      // New list of TransactionMemberDetail
-      var transactionMemberDetails = new List<TransactionMemberDetail>();
+      // New list of TransactionMemberStats
+      var transactionMemberStatsList = new List<TransactionMemberStats>();
 
       // Loop all expenses & add to list
       foreach (var expense in group.Expenses.Where(exp => exp.IsoCode == currencyCode))
       {
-        var transactionMemberDetail = expense.ToTransactionMemberDetailFromUserId(userId);
+        var transactionMemberStats = expense.ToTransactionMemberStatsFromUserId(userId);
 
-        if (transactionMemberDetail is not null) {
-          transactionMemberDetails.Add(transactionMemberDetail);
+        if (transactionMemberStats is not null) {
+          transactionMemberStatsList.Add(transactionMemberStats);
         }
       };
 
       // Loop all transfers & add to list
       foreach (var transfer in group.Transfers.Where(exp => exp.IsoCode == currencyCode))
       {
-        var transactionMemberDetail = transfer.ToTransactionMemberDetailFromUserId(userId);
+        var transactionMemberStats = transfer.ToTransactionMemberStatsFromUserId(userId);
 
-        if (transactionMemberDetail is not null) {
-          transactionMemberDetails.Add(transactionMemberDetail);
+        if (transactionMemberStats is not null) {
+          transactionMemberStatsList.Add(transactionMemberStats);
         }
       };
 
       // Sort list
-      var sortedTransactionMemberDetails = transactionMemberDetails.OrderBy(h => h.CreatedAt);
+      var sortedTransactionMemberStatsList = transactionMemberStatsList.OrderBy(transactionStats => transactionStats.CreatedAt);
 
       // New empty timeline for current currency & initialize totals
       var transactionTimelineForCurrency = new List<TransactionTimelineItem>();
       var totalLentSoFar = 0m;
       var totalBorrowedSoFar = 0m;
 
-      // Loop sortedTransactionMemberDetails created before
-      foreach (var transactionMemberDetail in sortedTransactionMemberDetails)
+      // Loop sortedTransactionMemberStatsList created before
+      foreach (var transactionMemberStats in sortedTransactionMemberStatsList)
       {
-        totalLentSoFar += transactionMemberDetail.Lent;
-        totalBorrowedSoFar += transactionMemberDetail.Borrowed;
+        totalLentSoFar += transactionMemberStats.Lent;
+        totalBorrowedSoFar += transactionMemberStats.Borrowed;
 
-        transactionTimelineForCurrency.Add(transactionMemberDetail.ToTransactionTimelineItem(totalLentSoFar, totalBorrowedSoFar));
+        transactionTimelineForCurrency.Add(transactionMemberStats.ToTransactionTimelineItem(totalLentSoFar, totalBorrowedSoFar));
       };
 
       transactionTimelineForEachCurrency.Add(currencyCode, transactionTimelineForCurrency);

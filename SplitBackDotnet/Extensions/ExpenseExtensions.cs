@@ -5,7 +5,9 @@ namespace SplitBackDotnet.Extensions;
 public static class ExpenseExtensions
 {
 
-  public static TransactionMemberDetail? ToTransactionMemberDetailFromUserId(this Expense expense, int userId) {
+  public static TransactionMemberStats? ToTransactionMemberStatsFromUserId(this Expense expense, int userId) {
+
+    if(expense is null) return null;
 
     bool isSpender = expense.ExpenseSpenders.ToList().Any(es => es.SpenderId == userId);
     bool isParticipant = expense.ExpenseParticipants.ToList().Any(ep => ep.ParticipantId == userId);
@@ -38,7 +40,7 @@ public static class ExpenseExtensions
       borrowed = participantAmount;
     }
 
-    return new TransactionMemberDetail {
+    return new TransactionMemberStats {
       TransactionId = expense.ExpenseId,
       CreatedAt = expense.CreatedAt,
       Description = expense.Description,
