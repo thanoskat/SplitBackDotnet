@@ -14,8 +14,7 @@ public static class ExpenseEndpoints
   {
     app.MapPost("/addExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
     {
-      try
-      {
+      try {
         var expenseValidator = new ExpenseValidator();
         var validationResult = expenseValidator.Validate(newExpenseDto);
         if (validationResult.Errors.Count > 0)
@@ -39,32 +38,34 @@ public static class ExpenseEndpoints
       }
     });
 
-    app.MapPost("/editExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
-       {
-         try
-         {
-           var expenseValidator = new ExpenseValidator();
-           var validationResult = expenseValidator.Validate(newExpenseDto);
-           if (validationResult.Errors.Count > 0)
-           {
-             return Results.Ok(validationResult.Errors.Select(x => new
-             {
-               Message = x.ErrorMessage,
-               Field = x.PropertyName
-             }));
-           }
-           ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
-           await repo.EditExpense(newExpenseDto);
-
-           var group = await repo.GetGroupById(newExpenseDto.GroupId);
-           if (group is null) throw new Exception();
-           return Results.Ok(group.PendingTransactions());
-         }
-         catch (Exception ex)
-         {
-           return Results.BadRequest(ex.Message);
-         }
-       });
+    app.MapPost("/editExpense", async (IRepo repo, NewExpenseDto newExpenseDto, IMapper _mapper) => {
+      try {
+        var editedExpense = _mapper.Map<Expense>(newExpenseDto);
+        editedExpense.ExpenseId = 1;
+        // editedExpense.ExpenseParticipants = newExpenseDto.ExpenseParticipants;
+        // editedExpense.ExpenseSpenders = newExpenseDto.ExpenseSpenders;
+        
+        var group = await repo.GetGroupById(newExpenseDto.GroupId);
+        if (group is null) throw new Exception();
+        return Results.Ok(group.PendingTransactions());
+      }
+      catch (Exception ex) {
+        return Results.BadRequest(ex.Message);
+      }
+    });
+    
+    app.MapPost("/get-expense/{expenseID}", (IRepo repo, int expenseId) => {
+      
+      try {
+        var expenseFound = repo.GetExpenseById(expenseId);
+        if(expenseFound is null) return Results.BadRequest($"Expense with id {expenseId} does not exist");
+        
+        return Results.Ok(expenseFound);
+      }
+      catch(Exception ex) {
+        return Results.BadRequest(ex.Message);
+      }
+    });
 
     app.MapPost("/removeExpense", async (IRepo repo, RemoveExpenseDto removeExpenseDto) =>
     {

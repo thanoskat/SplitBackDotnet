@@ -99,4 +99,15 @@ public class Repo : IRepo {
     public async Task SaveChangesAsync() {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<Expense?> GetExpenseById(int expenseId) {
+        try {
+          var expenseFound = await _context.Expenses.FindAsync(expenseId);
+          if(expenseFound is null) return null;
+          return expenseFound;
+        }
+        catch(Exception ex) {
+          return null;
+        }
+    }
 }

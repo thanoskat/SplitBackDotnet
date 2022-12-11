@@ -16,6 +16,8 @@ public interface IRepo
 
   Task EditExpense(NewExpenseDto newExpenseDto);
   
+  Task<Expense?> GetExpenseById(int expenseId);
+  
   Task RemoveExpense(RemoveExpenseDto removeExpenseDto);
 
   Task RemoveTransfer(RemoveTransferDto removeTransferDto);
