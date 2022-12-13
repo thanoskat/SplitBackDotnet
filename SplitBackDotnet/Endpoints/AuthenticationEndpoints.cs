@@ -18,7 +18,7 @@ public static class AuthenticationEndpoints
   public static void MapAuthenticationEndpoints(this IEndpointRouteBuilder app)
   {
 
-    app.MapPost("/auth/verify-token", async (HttpResponse response, IConfiguration config, DataContext context, [FromBody] TokenBody tokenBody) =>
+    app.MapPost("/auth/verify-token", async (HttpResponse response, IConfiguration config, IRepo repo, [FromBody] TokenBody tokenBody) =>
     {
       var tokenHandler = new JwtSecurityTokenHandler();
       var key = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
@@ -39,7 +39,7 @@ public static class AuthenticationEndpoints
         var unique = validatedJwtToken.Payload.Claims.First(claim => claim.Type == "unique").Value;
         if (unique == null) return Results.BadRequest("No unique cookie");
 
-        var sessionFound = await context.Sessions.FirstOrDefaultAsync(session => session.Unique == unique);
+        var sessionFound = await repo.GetSessionByUnique(unique);//await context.Sessions.FirstOrDefaultAsync(session => session.Unique == unique);
         if (sessionFound != null) return Results.BadRequest("Verification link already used");
 
         var newRefreshToken = Guid.NewGuid().ToString();
@@ -54,16 +54,16 @@ public static class AuthenticationEndpoints
             Email = email,
             Nickname = nickanme,
           };
-          context.Add(newUser);
+          await repo.AddUser(newUser);
 
           var newSession = new Session
           {
             RefreshToken = newRefreshToken,
-            User = newUser,
+            UserId = newUser.Id,
             Unique = unique
           };
-          context.Add(newSession);
-          await context.SaveChangesAsync();
+          await repo.AddSession(newSession);
+
 
           return Results.Ok(new { type = "sign-up" });
 
@@ -71,17 +71,17 @@ public static class AuthenticationEndpoints
         else if (type == "sign-in")
         {
           var email = validatedJwtToken.Payload.Claims.First(claim => claim.Type == "email").Value;
-          var userFound = context.Users.FirstOrDefault(user => user.Email == email);
+          var userFound = await repo.GetUserByEmail(email);
           if (userFound == null) return Results.NotFound("User does not exist");
 
           var newSession = new Session
           {
             RefreshToken = newRefreshToken,
-            User = userFound,
+            UserId = userFound.Id,
             Unique = unique
           };
-          context.Add(newSession);
-          await context.SaveChangesAsync();
+          await repo.AddSession(newSession);
+
 
           return Results.Ok(new { type = "sign-in" });
         }
@@ -95,15 +95,15 @@ public static class AuthenticationEndpoints
       }
     });
 
-    app.MapPost("/auth/sign-in", async (IConfiguration config, HttpRequest request, HttpResponse response, DataContext context) =>
+    app.MapPost("/auth/sign-in", async (IConfiguration config, HttpRequest request, HttpResponse response, IRepo repo) =>
     {
       var unique = request.Cookies["unique"];
       if (unique == null) return Results.Unauthorized();
 
-      var sessionFound = await context.Sessions.Include(session => session.User).FirstOrDefaultAsync(session => session.Unique == unique);
+      var sessionFound = await repo.GetSessionByUnique(unique);
       if (sessionFound == null) return Results.Unauthorized();
 
-      var userFound = await context.Users.FirstOrDefaultAsync(user => user == sessionFound.User);
+      var userFound = await repo.GetUserById(sessionFound.UserId);
       if (userFound == null) return Results.Unauthorized();
 
       response.Cookies.Delete("unique", new CookieOptions
@@ -132,7 +132,7 @@ public static class AuthenticationEndpoints
       var tokenDescriptor = new SecurityTokenDescriptor
       {
         Subject = new ClaimsIdentity(new[] {
-          new Claim("userId", sessionFound.User.UserId.ToString())
+          new Claim("userId", sessionFound.UserId)
         }),
         Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],
@@ -147,18 +147,17 @@ public static class AuthenticationEndpoints
         accessToken = jwtTokenHandler.WriteToken(token),
         sessionData = new
         {
-          id = sessionFound.SessionId,
-          userId = userFound.UserId,
+          id = sessionFound.Id,
+          userId = userFound.Id,
           userEmail = userFound.Email,
           userNickname = userFound.Nickname
         }
       });
     });
 
-    app.MapPost("/auth/request-sign-up", (HttpResponse response, IMapper mapper, IConfiguration config, DataContext context, UserCreateDto userCreateDto) =>
+    app.MapPost("/auth/request-sign-up", async (HttpResponse response, IMapper mapper, IConfiguration config, IRepo repo, UserCreateDto userCreateDto) =>
     {
-      
-      if (context.Users.Any(_user => _user.Email == userCreateDto.Email))
+      if (await repo.EmailExists(userCreateDto.Email))
       {
         return Results.Ok("User already exists!");
       }
@@ -199,9 +198,9 @@ public static class AuthenticationEndpoints
       return Results.Ok($"{jwtToken}");
     });
 
-    app.MapPost("/auth/request-sign-in", async (EmailBody emailBody, HttpResponse response, IConfiguration config, DataContext context) =>
+    app.MapPost("/auth/request-sign-in", async (EmailBody emailBody, HttpResponse response, IConfiguration config, IRepo repo) =>
     {
-      var userFound = await context.Users.FirstOrDefaultAsync(user => user.Email == emailBody.Email);
+      var userFound = await repo.GetUserByEmail(emailBody.Email);
       if (userFound == null) return Results.Unauthorized();
 
       var unique = Guid.NewGuid().ToString();
@@ -240,12 +239,12 @@ public static class AuthenticationEndpoints
       return Results.Ok($"{jwtToken}");
     });
 
-    app.MapPost("/auth/refreshtoken", async (HttpRequest request, DataContext context, IConfiguration config) =>
+    app.MapPost("/auth/refreshtoken", async (HttpRequest request, IConfiguration config, IRepo repo) =>
     {
       var refreshToken = request.Cookies["refreshToken"];
       if (refreshToken == null) return Results.BadRequest();
 
-      var sessionFound = await context.Sessions.Include(session => session.User).FirstOrDefaultAsync(session => session.RefreshToken == refreshToken);
+      var sessionFound = await repo.GetSessionByRefreshToken(refreshToken);
       if (sessionFound == null) return Results.BadRequest();
 
       var secureKey = Encoding.UTF8.GetBytes(config["Jwt:Key"]);
@@ -256,7 +255,7 @@ public static class AuthenticationEndpoints
       var tokenDescriptor = new SecurityTokenDescriptor
       {
         Subject = new ClaimsIdentity(new[] {
-          new Claim("userId", sessionFound.User.UserId.ToString())
+          new Claim("userId", sessionFound.UserId)
         }),
         Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],

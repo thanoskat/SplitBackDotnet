@@ -31,6 +31,51 @@ public class MongoRepo : IRepo
 
   }
 
+  public async Task<bool> EmailExists(string email)
+  {
+    var filter = Builders<User>.Filter.Eq("Email", email);
+    var userCount = await _userCollection.CountDocumentsAsync(user => user.Email == email);
+    return userCount > 0;
+
+  }
+
+  public async Task<Session> GetSessionByUnique(string unique)
+  {
+    return await _sessionCollection.FindAsync(session => session.Unique == unique).Result.SingleOrDefaultAsync();
+  }
+
+  public async Task<User> GetUserByEmail(string email)
+  {
+    return await _userCollection.FindAsync(user => user.Email == email).Result.SingleOrDefaultAsync();
+  }
+
+  public async Task<User> GetUserById(string userId)
+  {
+    return await _userCollection.FindAsync(user => user.Id == userId).Result.SingleOrDefaultAsync();
+  }
+
+  public async Task<Session> GetSessionByRefreshToken(string refreshToken)
+  {
+    return await _sessionCollection.FindAsync(session => session.RefreshToken == refreshToken).Result.SingleOrDefaultAsync();
+  }
+  public async Task AddUser(User user)
+  {
+    if (user is null)
+    {
+      throw new ArgumentNullException(nameof(user));
+    }
+    await _userCollection.InsertOneAsync(user);
+  }
+  public async Task AddSession(Session session)
+  {
+    if (session is null)
+    {
+      throw new ArgumentNullException(nameof(session));
+    }
+    await _sessionCollection.InsertOneAsync(session);
+
+  }
+
   public Task AddLabel(Label label)
   {
     throw new NotImplementedException();
@@ -76,8 +121,4 @@ public class MongoRepo : IRepo
     throw new NotImplementedException();
   }
 
-  public Task SaveChangesAsync()
-  {
-    throw new NotImplementedException();
-  }
 }

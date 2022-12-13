@@ -7,12 +7,12 @@ using AutoMapper;
 
 namespace SplitBackDotnet.Tests.Unit;
 
-public class AddExpenseTest
-{
-  [Fact]
-  public async Task CreateGroup_ShouldReturnGroup()
-  {
-    await using var context = new MockDb().CreateDbContext();
-  }
+// public class AddExpenseTest
+// {
+//   [Fact]
+//   public async Task CreateGroup_ShouldReturnGroup()
+//   {
+//     await using var context = new MockDb().CreateDbContext();
+//   }
 
-}
+// }
