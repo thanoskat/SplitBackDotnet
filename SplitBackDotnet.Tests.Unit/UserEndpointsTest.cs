@@ -9,23 +9,23 @@ namespace SplitBackDotnet.Tests.Unit;
 
 public class UserEndpointsTest {
 
-  [Fact]
-  public async Task GetUsers_ShouldReturnUsers() {
+  // [Fact]
+  // public async Task GetUsers_ShouldReturnUsers() {
 
-    //Arrange
-    await using var context = new MockDb().CreateDbContext();
-    context.Add(new User {
-      Nickname = "blabla",
-      Email = "blabla@email.com"
-    });
-    await context.SaveChangesAsync();
+  //   //Arrange
+  //   await using var context = new MockDb().CreateDbContext();
+  //   context.Add(new User {
+  //     Nickname = "blabla",
+  //     Email = "blabla@email.com"
+  //   });
+  //   await context.SaveChangesAsync();
 
-    //Act
-    var result = await UserEndpoints.GetUsers(context);
+  //   //Act
+  //   var result = await UserEndpoints.GetUsers(context);
 
-    //Assert
-    Assert.IsType<Ok<List<User>>>(result);
-  }
+  //   //Assert
+  //   Assert.IsType<Ok<List<User>>>(result);
+  // }
 
   //[Fact]
   //public async Task AddUser_ShouldAddUserAndReturnUsers()

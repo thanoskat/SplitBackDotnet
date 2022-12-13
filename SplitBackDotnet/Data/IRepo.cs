@@ -5,7 +5,6 @@ namespace SplitBackDotnet.Data;
 
 public interface IRepo
 {
-
   Task SaveChangesAsync();
 
   Task CreateGroup(Group group);
@@ -23,4 +22,5 @@ public interface IRepo
   Task AddNewTransfer(NewTransferDto newTransferDto);
 
   Task<Group?> GetGroupById(int groupId);
+
 }

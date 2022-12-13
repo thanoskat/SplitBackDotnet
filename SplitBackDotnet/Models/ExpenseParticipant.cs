@@ -1,10 +1,12 @@
 ﻿namespace SplitBackDotnet.Models;
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 public class ExpenseParticipant
 {
-  public int ParticipantId { get; set; }
-  public User Participant { get; set; } = null!;
-  public int ExpenseId { get; set; }
-  public Expense Expense { get; set; } = null!;
+  [BsonId]
+  [BsonRepresentation(BsonType.ObjectId)]
+  public string Id { get; set; }
   public decimal ContributionAmount { get; set; }
 }

@@ -5,23 +5,40 @@ using SplitBackDotnet.Data;
 using SplitBackDotnet.Endpoints;
 using SplitBackDotnet.Services;
 using System.Text.Json.Serialization;
+using MongoDB.Driver;
+using SplitBackDotnet.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<JsonOptions>(options => {
+builder.Services.Configure<JsonOptions>(options =>
+{
   options.SerializerOptions.AllowTrailingCommas = true;
   options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Prevent reference loop
 });
 
-builder.Services.AddDbContext<DataContext>(options =>
-  options.UseSqlite(@"DataSource=mydatabase.db;")
- );
+// builder.Services.AddDbContext<DataContext>(options =>
+//   options.UseSqlite(@"DataSource=mydatabase.db;")
+//  );
+
+builder.Services.Configure<AlphaSplitDatabaseSettings>(
+builder.Configuration.GetSection("AlphaSplitDatabase"));
 
 
-builder.Services.AddScoped<IRepo, Repo>();
-builder.Services.AddCors(options => {
+// var client = new MongoClient("mongodb+srv://dbSplitUser:1423qrwe@cluster0.mqehg.mongodb.net/db1?retryWrites=true&w=majority");
+// var db = client.GetDatabase("db1");
+// var collection  = db.GetCollection<PersonModel>("people");
+// var person = new PersonModel{FirstName="christos", LastName="kechagias"};
+
+// await collection.InsertOneAsync(person);
+
+
+builder.Services.AddScoped<IRepo, MongoRepo>();
+builder.Services.AddCors(options =>
+{
   options.AddPolicy("AllowAllPolicy",
-  builder => {
+  builder =>
+  {
     builder
       .WithOrigins(new[] { "http://localhost:3000" })
       .AllowAnyMethod()

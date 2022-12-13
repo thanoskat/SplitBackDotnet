@@ -23,7 +23,7 @@ public class ExpenseValidator : AbstractValidator<NewExpenseDto> {
       //.Cascade(CascadeMode.Stop)
       .NotNull().NotEmpty().WithMessage("Description is required");
 
-      When(newExpense => !newExpense.SplitEqually && newExpense.ExpenseParticipants.Count >= 2, () => {
+      When(newExpense => !newExpense.SplitEqually && newExpense.ExpenseParticipants.Count >= 1, () => {
         RuleForEach(newExpense => newExpense.ExpenseParticipants)
        .Must(ep => ep.ContributionAmount.CheckIfDecimal())
        .WithMessage("A valid amount is required")
@@ -39,7 +39,7 @@ public class ExpenseValidator : AbstractValidator<NewExpenseDto> {
        });
       });
 
-      When(newExpense => newExpense.ExpenseSpenders.Count >= 2, () => {
+      When(newExpense => newExpense.ExpenseSpenders.Count >= 1, () => {
         RuleForEach(newExpense => newExpense.ExpenseParticipants)
        .Must(ep => ep.ContributionAmount.CheckIfDecimal())
        .WithMessage("A valid amount is required")

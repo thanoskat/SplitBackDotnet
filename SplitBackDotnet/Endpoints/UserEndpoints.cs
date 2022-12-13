@@ -9,7 +9,7 @@ namespace SplitBackDotnet.Endpoints;
 public static class UserEndpoints {
   public static void MapUserEndpoints(this IEndpointRouteBuilder app) {
 
-    app.MapGet("/user", GetUsers);
+    //app.MapGet("/user", GetUsers);
 
     //app.MapGet("/user/{id}", async (DataContext context, int id) =>
     //  await context.Users.FindAsync(id) is User user ?
@@ -17,7 +17,7 @@ public static class UserEndpoints {
     //    Results.NotFound("Sorry, user not found. <3")
     //);
 
-    app.MapPost("/user", AddUser);
+    //app.MapPost("/user", AddUser);
 
     //app.MapPut("/user/{id}", async (DataContext context, User user, int id) => {
     //  var dbUser = await context.Users.FindAsync(id);
@@ -43,17 +43,17 @@ public static class UserEndpoints {
   //public static async Task<Results<Ok<List<User>>, BadRequest<string>>> GetUsers(DataContext context) {}
 
 
-  public static async Task<IResult> GetUsers(DataContext context) {
-    // return TypedResults.BadRequest("lala");
-    return TypedResults.Ok(await context.Users.Include(user => user.CreatedGroups).ToListAsync());
-  }
+  // public static async Task<IResult> GetUsers(DataContext context) {
+  //   // return TypedResults.BadRequest("lala");
+  //   return TypedResults.Ok(await context.Users.Include(user => user.CreatedGroups).ToListAsync());
+  // }
 
-  public static async Task<IResult> AddUser(DataContext context, IMapper mapper, UserCreateDto userCreateDto)
-  {
-    var newUser = mapper.Map<User>(userCreateDto);
-    context.Users.Add(newUser);
-    await context.SaveChangesAsync();
-    return TypedResults.Ok(await context.Users.ToArrayAsync());
-  }
+  // public static async Task<IResult> AddUser(DataContext context, IMapper mapper, UserCreateDto userCreateDto)
+  // {
+  //   var newUser = mapper.Map<User>(userCreateDto);
+  //   context.Users.Add(newUser);
+  //   await context.SaveChangesAsync();
+  //   return TypedResults.Ok(await context.Users.ToArrayAsync());
+  // }
 
 }

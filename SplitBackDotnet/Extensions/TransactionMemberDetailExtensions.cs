@@ -12,7 +12,7 @@ public static class TransactionMemberDetailExtensions
   {
     return new TransactionTimelineItem
     {
-      TransactionId = transactionMemberDetail.TransactionId,
+      Id = transactionMemberDetail.Id,
       CreatedAt = transactionMemberDetail.CreatedAt,
       Description = transactionMemberDetail.Description,
       Lent = transactionMemberDetail.Lent,

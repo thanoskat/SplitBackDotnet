@@ -30,19 +30,19 @@ public static class GroupExtensions
 
       group.Members.ToList().ForEach(member =>
       {
-        participants.Add(new Participant(member.UserId, 0m, 0m));
+        participants.Add(new Participant(member, 0m, 0m));
       });
 
       group.Expenses.Where(exp => exp.IsoCode == currentIsoCode).ToList().ForEach(expense =>
       {
         expense.ExpenseParticipants.ToList().ForEach(expenseParticipant =>
         {
-          participants.Single(p => p.Id == expenseParticipant.ParticipantId).TotalAmountTaken += expenseParticipant.ContributionAmount;
+          participants.Single(p => p.Id == expenseParticipant.Id).TotalAmountTaken += expenseParticipant.ContributionAmount;
         });
 
         expense.ExpenseSpenders.ToList().ForEach(expenseSpender =>
         {
-          participants.Single(p => p.Id == expenseSpender.SpenderId).TotalAmountGiven += expenseSpender.SpenderAmount;
+          participants.Single(p => p.Id == expenseSpender.Id).TotalAmountGiven += expenseSpender.SpenderAmount;
         });
       });
 
@@ -128,13 +128,13 @@ public static class GroupExtensions
 
   public static void AddAsCreatorAndMember(this Group group, User user)
   {
-    group.Members.Add(user);
-    group.Creator = user;
+    group.Members.Add(user.Id);
+    group.CreatorId = user.Id;
   }
 
   public static Dictionary<string, List<TransactionTimelineItem>> GetTransactionHistory(this Group group)
   {
-    var userId = 3;
+    var userId = "1";
     var uniqueIsoCodeList = group.UniqueCurrencyCodes();
     var transactionTimelineForEachCurrency = new Dictionary<string, List<TransactionTimelineItem>>();
 
@@ -183,7 +183,6 @@ public static class GroupExtensions
 
       transactionTimelineForEachCurrency.Add(currencyCode, transactionTimelineForCurrency);
     };
-
     return transactionTimelineForEachCurrency;
   }
 
@@ -192,13 +191,13 @@ public static class GroupExtensions
 public record Participant
 {
 
-  public Participant(int id, decimal totalAmountGiven, decimal totalAmountTaken)
+  public Participant(string id, decimal totalAmountGiven, decimal totalAmountTaken)
   {
     Id = id;
     TotalAmountGiven = totalAmountGiven;
     TotalAmountTaken = totalAmountTaken;
   }
-  public int Id { get; set; }
+  public string Id { get; set; }
   public decimal TotalAmountGiven { get; set; }
   public decimal TotalAmountTaken { get; set; }
 }

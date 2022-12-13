@@ -1,11 +1,19 @@
-﻿namespace SplitBackDotnet.Models; 
+﻿namespace SplitBackDotnet.Models;
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-public class Session {
-  public int SessionId { get; set; }
+public class Session
+{
+  [BsonId]
+  [BsonRepresentation(BsonType.ObjectId)]
+  public string Id { get; set; }
   [Required]
-  public string RefreshToken { get; set; } =String.Empty;
+  public string RefreshToken { get; set; } = String.Empty;
   [Required]
-  public User User { get; set; } = new User();
-  public string? Unique { get; set; }  
+  [BsonRepresentation(BsonType.ObjectId)]
+  public string UserId { get; set; }
+  public string? Unique { get; set; }
+  public DateTime CreatedAt { get; set; }
 }
+

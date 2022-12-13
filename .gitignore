@@ -368,3 +368,4 @@ FodyWeavers.xsd
 /SplitBackDotnet/mydatabase.db-wal
 /SplitBackDotnet/Migrations/
 
+.env

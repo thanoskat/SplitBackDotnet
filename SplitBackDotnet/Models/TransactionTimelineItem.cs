@@ -19,7 +19,7 @@ public class TransactionTimelineItem
 
   // }
 
-  public int TransactionId { get; set; }
+  public string Id { get; set; }
 
   public DateTime CreatedAt { get; set; }
 
