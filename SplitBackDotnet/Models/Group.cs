@@ -23,5 +23,5 @@ public class Group
   public ICollection<Transfer> Transfers { get; set; } = new List<Transfer>();
 
   public ICollection<Label> GroupLabels { get; set; } = new List<Label>();
-  public DateTime CreatedAt { get; set; }
+  public DateTime CreatedAt { get; set; }= DateTime.UtcNow;
 }

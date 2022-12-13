@@ -19,4 +19,6 @@ public class User
 
   public ICollection<Group> Groups { get; set; } = new List<Group>();
 
+  public DateTime Date { get; set; } = DateTime.UtcNow;
+
 }

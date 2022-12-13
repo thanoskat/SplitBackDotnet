@@ -16,5 +16,5 @@ public class Transfer
   public string SenderId { get; set; }
   [BsonRepresentation(BsonType.ObjectId)]
   public string ReceiverId { get; set; }
-  public DateTime CreatedAt { get; set; }
+  public DateTime CreatedAt { get; set; }= DateTime.UtcNow;
 }

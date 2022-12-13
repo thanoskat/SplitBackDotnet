@@ -16,6 +16,6 @@ public class Expense
   [Required]
   public ICollection<ExpenseParticipant> ExpenseParticipants { get; set; } = new List<ExpenseParticipant>();
   public Label? Label { get; set; }
-  public DateTime CreatedAt { get; set; }
+  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
   public string IsoCode { get; set; }
 }

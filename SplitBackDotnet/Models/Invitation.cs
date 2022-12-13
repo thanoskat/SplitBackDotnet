@@ -15,6 +15,6 @@ public class Invitation
   public string Code { get; set; } = null!;
   [BsonRepresentation(BsonType.ObjectId)]
   public string GroupId { get; set; } = null!;
-  public DateTime CreatedAt { get; set; }
+  public DateTime CreatedAt { get; set; }= DateTime.UtcNow;
 
 }

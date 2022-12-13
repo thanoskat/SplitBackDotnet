@@ -14,6 +14,5 @@ public class Session
   [BsonRepresentation(BsonType.ObjectId)]
   public string UserId { get; set; }
   public string? Unique { get; set; }
-  public DateTime CreatedAt { get; set; }
+  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
-
