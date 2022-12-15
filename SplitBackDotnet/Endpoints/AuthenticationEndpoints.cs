@@ -132,7 +132,7 @@ public static class AuthenticationEndpoints
       var tokenDescriptor = new SecurityTokenDescriptor
       {
         Subject = new ClaimsIdentity(new[] {
-          new Claim("userId", sessionFound.UserId)
+          new Claim("userId", sessionFound.UserId.ToString())
         }),
         Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],
@@ -255,7 +255,7 @@ public static class AuthenticationEndpoints
       var tokenDescriptor = new SecurityTokenDescriptor
       {
         Subject = new ClaimsIdentity(new[] {
-          new Claim("userId", sessionFound.UserId)
+          new Claim("userId", sessionFound.UserId.ToString())
         }),
         Expires = DateTime.Now.AddMinutes(10),
         Audience = config["Jwt:Audience"],

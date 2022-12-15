@@ -1,11 +1,12 @@
 using SplitBackDotnet.Models;
+using MongoDB.Bson;
 
 namespace SplitBackDotnet.Extensions;
 
 public static class ExpenseExtensions
 {
 
-  public static TransactionMemberDetail? ToTransactionMemberDetailFromUserId(this Expense expense, string userId) {
+  public static TransactionMemberDetail? ToTransactionMemberDetailFromUserId(this Expense expense, ObjectId userId) {
 
     bool isSpender = expense.ExpenseSpenders.ToList().Any(es => es.Id == userId);
     bool isParticipant = expense.ExpenseParticipants.ToList().Any(ep => ep.Id == userId);

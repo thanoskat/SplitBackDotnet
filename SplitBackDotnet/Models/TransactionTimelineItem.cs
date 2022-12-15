@@ -1,5 +1,5 @@
+using MongoDB.Bson;
 namespace SplitBackDotnet.Models;
-
 public class TransactionTimelineItem
 {
   // public TransactionTimelineItem(
@@ -19,7 +19,7 @@ public class TransactionTimelineItem
 
   // }
 
-  public string Id { get; set; }
+  public ObjectId Id { get; set; }
 
   public DateTime CreatedAt { get; set; }
 

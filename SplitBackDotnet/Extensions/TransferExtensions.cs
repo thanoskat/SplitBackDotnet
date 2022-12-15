@@ -1,11 +1,12 @@
 using SplitBackDotnet.Models;
+using MongoDB.Bson;
 
 namespace SplitBackDotnet.Extensions;
 
 public static class TransferExtensions
 {
 
-  public static TransactionMemberDetail? ToTransactionMemberDetailFromUserId(this Transfer transfer, string userId)
+  public static TransactionMemberDetail? ToTransactionMemberDetailFromUserId(this Transfer transfer, ObjectId userId)
   {
     var isSender = transfer.SenderId == userId;
     var isReceiver = transfer.ReceiverId == userId;

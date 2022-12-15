@@ -1,5 +1,6 @@
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Helper;
+using MongoDB.Bson;
 
 namespace SplitBackDotnet.Extensions;
 
@@ -128,13 +129,13 @@ public static class GroupExtensions
 
   public static void AddAsCreatorAndMember(this Group group, User user)
   {
-    group.Members.Add(user.Id);
-    group.CreatorId = user.Id;
+    // group.Members.Add(user.Id);
+    // group.CreatorId = user.Id;
   }
 
   public static Dictionary<string, List<TransactionTimelineItem>> GetTransactionHistory(this Group group)
   {
-    var userId = "1";
+    var userId = new ObjectId("6398c3714604309d8de95eb5");//this is going to be the authorized user's Id.
     var uniqueIsoCodeList = group.UniqueCurrencyCodes();
     var transactionTimelineForEachCurrency = new Dictionary<string, List<TransactionTimelineItem>>();
 
@@ -191,13 +192,13 @@ public static class GroupExtensions
 public record Participant
 {
 
-  public Participant(string id, decimal totalAmountGiven, decimal totalAmountTaken)
+  public Participant(ObjectId id, decimal totalAmountGiven, decimal totalAmountTaken)
   {
     Id = id;
     TotalAmountGiven = totalAmountGiven;
     TotalAmountTaken = totalAmountTaken;
   }
-  public string Id { get; set; }
+  public ObjectId Id { get; set; }
   public decimal TotalAmountGiven { get; set; }
   public decimal TotalAmountTaken { get; set; }
 }

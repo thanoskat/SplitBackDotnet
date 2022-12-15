@@ -1,8 +1,8 @@
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Dtos;
+using MongoDB.Bson;
 
 namespace SplitBackDotnet.Data;
-
 public interface IRepo
 {
   Task CreateGroup(Group group);
@@ -31,8 +31,10 @@ public interface IRepo
 
   Task<User> GetUserByEmail(string email);
 
-  Task<User> GetUserById(string userId);
+  Task<User> GetUserById(ObjectId userId);
 
   Task<Session> GetSessionByRefreshToken(string refreshToken);
+
+  Task AddUserToGroup(ObjectId groupID, ObjectId UserID);
 
 }

@@ -5,9 +5,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 public class User
 {
-  [BsonId]
+
   [BsonRepresentation(BsonType.ObjectId)]
-  public string Id { get; set; }
+  public ObjectId Id { get; set; }
 
   [MaxLength(200)]
   [Required]
@@ -17,7 +17,7 @@ public class User
   [Required]
   public string Email { get; set; } = String.Empty;
 
-  public ICollection<Group> Groups { get; set; } = new List<Group>();
+  public ObjectId[] Groups { get; set; } = Array.Empty<ObjectId>();
 
   public DateTime Date { get; set; } = DateTime.UtcNow;
 

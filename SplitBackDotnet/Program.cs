@@ -5,9 +5,7 @@ using SplitBackDotnet.Data;
 using SplitBackDotnet.Endpoints;
 using SplitBackDotnet.Services;
 using System.Text.Json.Serialization;
-using MongoDB.Driver;
 using SplitBackDotnet.Models;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
