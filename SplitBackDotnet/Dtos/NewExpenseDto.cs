@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
 namespace SplitBackDotnet.Dtos
 {
   public class LabelDto
@@ -18,14 +19,14 @@ namespace SplitBackDotnet.Dtos
   public class ExpenseParticipantDto
   {
     [MaxLength(20)]
-    public string ParticipantId { get; set; }= null!;
+    public string ParticipantId { get; set; } = null!;
     [MaxLength(29)]
     public string ContributionAmount { get; set; } = null!;
   }
 
   public class NewExpenseDto
   {
-    public int GroupId { get; set; }
+    public string GroupId { get; set; } = null!;
     [MaxLength(80)]
     public string Description { get; set; } = null!;
     [MaxLength(29)]

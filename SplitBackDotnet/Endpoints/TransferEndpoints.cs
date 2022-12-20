@@ -1,6 +1,7 @@
 using SplitBackDotnet.Data;
 using SplitBackDotnet.Dtos;
 using SplitBackDotnet.Extensions;
+using MongoDB.Bson;
 namespace SplitBackDotnet.Endpoints;
 
 public static class TransferEndpoints
@@ -11,6 +12,7 @@ public static class TransferEndpoints
     {
       try
       {
+        var groupId = ObjectId.Parse(newTransferDto.GroupId);
         var transferValidator = new TransferValidator();
         var validationResult = transferValidator.Validate(newTransferDto);
         if (validationResult.Errors.Count > 0)
@@ -22,7 +24,7 @@ public static class TransferEndpoints
           }));
         }
         await repo.AddNewTransfer(newTransferDto);
-        var group = await repo.GetGroupById(newTransferDto.GroupId);
+        var group = await repo.GetGroupById( groupId);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());
       }
@@ -33,10 +35,10 @@ public static class TransferEndpoints
     });
     
     app.MapPost("/removeTransfer", async (IRepo repo, RemoveTransferDto removeTransferDto) =>
-    {
+    {var groupId = ObjectId.Parse(removeTransferDto.GroupId);
       try
       {
-        var group = await repo.GetGroupById(removeTransferDto.GroupId.ToInt());
+        var group = await repo.GetGroupById(groupId);
         await repo.RemoveTransfer(removeTransferDto);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());

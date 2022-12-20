@@ -135,7 +135,7 @@ public static class GroupExtensions
 
   public static Dictionary<string, List<TransactionTimelineItem>> GetTransactionHistory(this Group group)
   {
-    var userId = new ObjectId("6398c3714604309d8de95eb5");//this is going to be the authorized user's Id.
+    var userId = ObjectId.Parse("6398c3714604309d8de95eb5");//this is going to be the authorized user's Id.
     var uniqueIsoCodeList = group.UniqueCurrencyCodes();
     var transactionTimelineForEachCurrency = new Dictionary<string, List<TransactionTimelineItem>>();
 

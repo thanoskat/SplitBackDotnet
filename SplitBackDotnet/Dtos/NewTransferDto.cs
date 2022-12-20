@@ -3,7 +3,7 @@ namespace SplitBackDotnet.Dtos;
 
 public class NewTransferDto
 {
-  public int GroupId { get; set; }
+  public string GroupId { get; set; } = null!;
   [MaxLength(80)]
   public string? Description { get; set; }
   public string IsoCode { get; set; } = null!;

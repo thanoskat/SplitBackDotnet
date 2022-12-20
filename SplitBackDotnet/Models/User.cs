@@ -17,7 +17,7 @@ public class User
   [Required]
   public string Email { get; set; } = String.Empty;
 
-  public ObjectId[] Groups { get; set; } = Array.Empty<ObjectId>();
+  public ICollection<ObjectId> Groups { get; set; } =new List<ObjectId>();
 
   public DateTime Date { get; set; } = DateTime.UtcNow;
 

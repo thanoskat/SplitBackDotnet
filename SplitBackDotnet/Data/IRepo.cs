@@ -19,7 +19,7 @@ public interface IRepo
 
   Task AddNewTransfer(NewTransferDto newTransferDto);
 
-  Task<Group?> GetGroupById(int groupId);
+  Task<Group?> GetGroupById(ObjectId groupId);
 
   Task<bool> EmailExists(string Email);
 

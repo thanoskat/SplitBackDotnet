@@ -5,6 +5,7 @@ using AutoMapper;
 using SplitBackDotnet.Helper;
 using Microsoft.AspNetCore.Authorization;
 using SplitBackDotnet.Extensions;
+using MongoDB.Bson;
 
 namespace SplitBackDotnet.Endpoints;
 
@@ -14,6 +15,7 @@ public static class ExpenseEndpoints
   {
     app.MapPost("/addExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
     {
+      var groupId = new ObjectId(newExpenseDto.GroupId);
       try
       {
         var expenseValidator = new ExpenseValidator();
@@ -29,7 +31,7 @@ public static class ExpenseEndpoints
         ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
         await repo.AddNewExpense(newExpenseDto);
 
-        var group = await repo.GetGroupById(newExpenseDto.GroupId);
+        var group = await repo.GetGroupById(groupId);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());
       }
@@ -41,6 +43,7 @@ public static class ExpenseEndpoints
 
     app.MapPost("/editExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
        {
+         var groupId = ObjectId.Parse(newExpenseDto.GroupId);
          try
          {
            var expenseValidator = new ExpenseValidator();
@@ -56,7 +59,7 @@ public static class ExpenseEndpoints
            ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
            await repo.EditExpense(newExpenseDto);
 
-           var group = await repo.GetGroupById(newExpenseDto.GroupId);
+           var group = await repo.GetGroupById(groupId);
            if (group is null) throw new Exception();
            return Results.Ok(group.PendingTransactions());
          }
@@ -68,9 +71,10 @@ public static class ExpenseEndpoints
 
     app.MapPost("/removeExpense", async (IRepo repo, RemoveExpenseDto removeExpenseDto) =>
     {
+      var groupId = ObjectId.Parse(removeExpenseDto.GroupId);
       try
       {
-        var group = await repo.GetGroupById(removeExpenseDto.GroupId.ToInt());
+        var group = await repo.GetGroupById(groupId);
         await repo.RemoveExpense(removeExpenseDto);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());
@@ -85,9 +89,10 @@ public static class ExpenseEndpoints
 
     app.MapPost("/txHistory", async (IRepo repo, TransactionHistoryDto txHistoryDto) =>
     {
+      var groupId = ObjectId.Parse(txHistoryDto.GroupId);
       try
       {
-        var group = await repo.GetGroupById(txHistoryDto.GroupId.ToInt());
+        var group = await repo.GetGroupById(groupId);
         if (group is null) throw new Exception();
         if (group.Expenses.Count == 0)
         {

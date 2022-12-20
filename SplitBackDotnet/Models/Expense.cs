@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
+
 namespace SplitBackDotnet.Models;
 
 public class Expense

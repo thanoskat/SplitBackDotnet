@@ -8,13 +8,11 @@ public class Invitation
   [BsonId]
   [BsonRepresentation(BsonType.ObjectId)]
   public string Id { get; set; } = null!;
-  [BsonRepresentation(BsonType.ObjectId)]
-  public string Inviter { get; set; } = null!;
+  public ObjectId Inviter { get; set; }
 
   [MaxLength(10)]
   public string Code { get; set; } = null!;
-  [BsonRepresentation(BsonType.ObjectId)]
-  public string GroupId { get; set; } = null!;
+  public ObjectId GroupId { get; set; }
   public DateTime CreatedAt { get; set; }= DateTime.UtcNow;
 
 }
