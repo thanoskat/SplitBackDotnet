@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
-
 namespace SplitBackDotnet.Models;
 
-public class Expense
+public class ExpenseSnapShot
 {
   public ObjectId Id { get; set; }
   [MaxLength(100)]
@@ -14,7 +13,7 @@ public class Expense
   [Required]
   public ICollection<ExpenseParticipant> ExpenseParticipants { get; set; } = new List<ExpenseParticipant>();
   public Label? Label { get; set; }
-  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+  //public DateTime CreatedAt { get; set; }
+  public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
   public string IsoCode { get; set; } = null!;
-  public ICollection<ExpenseSnapShot>? History { get; set; } = new List<ExpenseSnapShot>();
 }

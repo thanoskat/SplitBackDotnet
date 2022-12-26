@@ -9,19 +9,19 @@ namespace SplitBackDotnet.Helper
 {
   public static class ExpenseSetUp
   {
-    public static void AllocateAmountEqually(NewExpenseDto newExpenseDto)
+    public static void AllocateAmountEqually<T>(T expenseDto) where T : IExpenseDto
     {
-      if (newExpenseDto.SplitEqually == true)
+      if (expenseDto.SplitEqually == true)
       {
-        bool success = Enum.TryParse<CurrencyIsoCode>(newExpenseDto.IsoCode, out CurrencyIsoCode isoCode);
+        bool success = Enum.TryParse<CurrencyIsoCode>(expenseDto.IsoCode, out CurrencyIsoCode isoCode);
         if (!success)
         {
           throw new Exception();
         }
-        var money = new Money(newExpenseDto.Amount.ToDecimal(), isoCode);
-        var DistributedAmountArr = money.Allocate(newExpenseDto.ExpenseParticipants.Count).ToList();
+        var money = new Money(expenseDto.Amount.ToDecimal(), isoCode);
+        var DistributedAmountArr = money.Allocate(expenseDto.ExpenseParticipants.Count).ToList();
         int index = 0;
-        foreach (ExpenseParticipantDto Participant in newExpenseDto.ExpenseParticipants)
+        foreach (ExpenseParticipantDto Participant in expenseDto.ExpenseParticipants)
         {
           Participant.ContributionAmount = DistributedAmountArr[index].Amount.ToString();
           index = index + 1;

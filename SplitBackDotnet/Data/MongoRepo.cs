@@ -93,15 +93,41 @@ public class MongoRepo : IRepo
     var updateExpenses = Builders<Group>.Update.AddToSet("Expenses", newExpense);
     await _groupCollection.FindOneAndUpdateAsync(group => group.Id == groupId, updateExpenses);
   }
-  public async Task EditExpense(NewExpenseDto newExpenseDto)
+  public async Task AddExpenseToHistory(Group oldGroup, ObjectId expenseId, FilterDefinition<Group>? filter)
   {
-    var newExpense = _mapper.Map<Expense>(newExpenseDto);
-    var groupId = ObjectId.Parse(newExpenseDto.GroupId);
-    var expenseId = ObjectId.Parse("63a1c5ccfd290a9717bf6bde");
+    var oldExpense = oldGroup.Expenses.First(e => e.Id == expenseId);
+    var snapShot = _mapper.Map<ExpenseSnapShot>(oldExpense);
+    var updateExpense = Builders<Group>.Update.Push("Expenses.$.History", snapShot);
+    await _groupCollection.FindOneAndUpdateAsync(filter, updateExpense);
+  }
+  public async Task EditExpense(EditExpenseDto editExpenseDto)
+  {
+    var newExpense = _mapper.Map<Expense>(editExpenseDto);
+    var groupId = ObjectId.Parse(editExpenseDto.GroupId);
+    //var expenseId = ObjectId.Parse(editExpenseDto.ExpenseId);
+    var expenseId = ObjectId.Parse("63a89383f5659971bc964193");
     var filter = Builders<Group>.Filter.Eq("_id", groupId) & Builders<Group>.Filter.ElemMatch(g => g.Expenses, e => e.Id == expenseId);
-    var updateExpense = Builders<Group>.Update.Set("Expenses.$", newExpense);
-    await _groupCollection.UpdateOneAsync(filter, updateExpense);
+    var updateExpense = Builders<Group>.Update
+           .Set("Expenses.$.Description", newExpense.Description)
+           .Set("Expenses.$.Amount", newExpense.Amount)
+           .Set("Expenses.$.ExpenseSpenders", newExpense.ExpenseSpenders)
+           .Set("Expenses.$.ExpenseParticipants", newExpense.ExpenseParticipants)
+           .Set("Expenses.$.Label", newExpense.Label)
+           .Set("Expenses.$.IsoCode", newExpense.IsoCode);
 
+    var client = new MongoClient(_connectionString);
+    using var session = await client.StartSessionAsync();
+    session.StartTransaction();
+    try
+    {
+      var oldGroup = await _groupCollection.FindOneAndUpdateAsync(filter, updateExpense);
+      await AddExpenseToHistory(oldGroup, expenseId, filter);
+    }
+    catch (Exception ex)
+    {
+      await session.AbortTransactionAsync();
+      Console.WriteLine(ex.Message);
+    }
   }
   public async Task AddNewTransfer(NewTransferDto newTransferDto)
   {

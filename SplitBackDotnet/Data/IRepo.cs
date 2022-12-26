@@ -11,7 +11,7 @@ public interface IRepo
 
   Task AddNewExpense(NewExpenseDto newExpenseDto);
 
-  Task EditExpense(NewExpenseDto newExpenseDto);
+  Task EditExpense(EditExpenseDto editExpenseDto);
 
   Task RemoveExpense(RemoveExpenseDto removeExpenseDto);
 

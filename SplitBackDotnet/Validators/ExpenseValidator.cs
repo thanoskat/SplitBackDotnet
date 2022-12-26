@@ -3,7 +3,7 @@ using SplitBackDotnet.Dtos;
 using SplitBackDotnet.Extensions;
 using NMoneys;
 
-public class ExpenseValidator : AbstractValidator<NewExpenseDto> {
+public class ExpenseValidator : AbstractValidator<IExpenseDto> {
 
   public ExpenseValidator() {
 

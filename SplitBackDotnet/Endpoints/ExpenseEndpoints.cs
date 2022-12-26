@@ -1,9 +1,7 @@
 ﻿using SplitBackDotnet.Data;
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Dtos;
-using AutoMapper;
 using SplitBackDotnet.Helper;
-using Microsoft.AspNetCore.Authorization;
 using SplitBackDotnet.Extensions;
 using MongoDB.Bson;
 
@@ -41,13 +39,13 @@ public static class ExpenseEndpoints
       }
     });
 
-    app.MapPost("/editExpense", async (IRepo repo, NewExpenseDto newExpenseDto) =>
+    app.MapPost("/editExpense", async (IRepo repo, EditExpenseDto editExpenseDto) =>
        {
-         var groupId = ObjectId.Parse(newExpenseDto.GroupId);
+         var groupId = ObjectId.Parse(editExpenseDto.GroupId);
          try
          {
            var expenseValidator = new ExpenseValidator();
-           var validationResult = expenseValidator.Validate(newExpenseDto);
+           var validationResult = expenseValidator.Validate(editExpenseDto);
            if (validationResult.Errors.Count > 0)
            {
              return Results.Ok(validationResult.Errors.Select(x => new
@@ -56,8 +54,8 @@ public static class ExpenseEndpoints
                Field = x.PropertyName
              }));
            }
-           ExpenseSetUp.AllocateAmountEqually(newExpenseDto);
-           await repo.EditExpense(newExpenseDto);
+           ExpenseSetUp.AllocateAmountEqually(editExpenseDto);
+           await repo.EditExpense(editExpenseDto);
 
            var group = await repo.GetGroupById(groupId);
            if (group is null) throw new Exception();
@@ -84,8 +82,6 @@ public static class ExpenseEndpoints
         return Results.BadRequest(ex.Message);
       }
     });
-
-
 
     app.MapPost("/txHistory", async (IRepo repo, TransactionHistoryDto txHistoryDto) =>
     {

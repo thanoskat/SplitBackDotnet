@@ -1,30 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using MongoDB.Bson;
-namespace SplitBackDotnet.Dtos
-{
-  public class LabelDto
-  {
-    [MaxLength(30)]
-    public string Name { get; set; } = null!;
-  }
+namespace SplitBackDotnet.Dtos;
 
-  public class ExpenseSpenderDto
-  {
-    [MaxLength(20)]
-    public string SpenderId { get; set; }= null!;
-    [MaxLength(29)]
-    public string SpenderAmount { get; set; } = null!;
-  }
-
-  public class ExpenseParticipantDto
-  {
-    [MaxLength(20)]
-    public string ParticipantId { get; set; } = null!;
-    [MaxLength(29)]
-    public string ContributionAmount { get; set; } = null!;
-  }
-
-  public class NewExpenseDto
+  public class NewExpenseDto: IExpenseDto
   {
     public string GroupId { get; set; } = null!;
     [MaxLength(80)]
@@ -38,4 +15,3 @@ namespace SplitBackDotnet.Dtos
     public ICollection<ExpenseParticipantDto> ExpenseParticipants { get; set; } = null!;
     public ICollection<ExpenseSpenderDto> ExpenseSpenders { get; set; } = null!;
   }
-}
