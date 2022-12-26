@@ -3,6 +3,7 @@ using SplitBackDotnet.Models;
 using SplitBackDotnet.Dtos;
 using SplitBackDotnet.Helper;
 using SplitBackDotnet.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using MongoDB.Bson;
 
 namespace SplitBackDotnet.Endpoints;
@@ -38,7 +39,21 @@ public static class ExpenseEndpoints
         return Results.BadRequest(ex.Message);
       }
     });
+    app.MapPost("/addComment", [Authorize] async (IRepo repo, HttpContext httpContext, NewCommentDto newComment) =>
+    {
+      var authedUserId = httpContext.GetAuthorizedUserId();
+      try
+      {
+        await repo.AddComment(newComment, authedUserId);
+        return Results.Ok();
+      }
+      catch (Exception ex)
+      {
+        return Results.BadRequest(ex.Message);
+      }
 
+    });
+    
     app.MapPost("/editExpense", async (IRepo repo, EditExpenseDto editExpenseDto) =>
        {
          var groupId = ObjectId.Parse(editExpenseDto.GroupId);

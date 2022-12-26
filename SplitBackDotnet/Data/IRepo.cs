@@ -6,6 +6,8 @@ namespace SplitBackDotnet.Data;
 public interface IRepo
 {
   Task CreateGroup(Group group);
+  
+  Task AddComment (NewCommentDto newComment, ObjectId userId);
 
   Task AddLabel(Label label);
 

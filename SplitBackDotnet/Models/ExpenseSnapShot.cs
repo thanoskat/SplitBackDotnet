@@ -13,7 +13,7 @@ public class ExpenseSnapShot
   [Required]
   public ICollection<ExpenseParticipant> ExpenseParticipants { get; set; } = new List<ExpenseParticipant>();
   public Label? Label { get; set; }
-  //public DateTime CreatedAt { get; set; }
+  public ICollection<Comment> Comments { get; set; } = new List<Comment>();
   public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
   public string IsoCode { get; set; } = null!;
 }

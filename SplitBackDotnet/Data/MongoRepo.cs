@@ -105,7 +105,7 @@ public class MongoRepo : IRepo
     var newExpense = _mapper.Map<Expense>(editExpenseDto);
     var groupId = ObjectId.Parse(editExpenseDto.GroupId);
     //var expenseId = ObjectId.Parse(editExpenseDto.ExpenseId);
-    var expenseId = ObjectId.Parse("63a89383f5659971bc964193");
+    var expenseId = ObjectId.Parse("63aa01d6fc5958282c420af2");
     var filter = Builders<Group>.Filter.Eq("_id", groupId) & Builders<Group>.Filter.ElemMatch(g => g.Expenses, e => e.Id == expenseId);
     var updateExpense = Builders<Group>.Update
            .Set("Expenses.$.Description", newExpense.Description)
@@ -129,6 +129,26 @@ public class MongoRepo : IRepo
       Console.WriteLine(ex.Message);
     }
   }
+
+  public async Task AddComment(NewCommentDto comment, ObjectId userId)
+  {
+    var newComment = _mapper.Map<Comment>(comment);
+    newComment.CommentorId = userId;
+    var expenseId = ObjectId.Parse(comment.ExpenseId);
+    var groupId = ObjectId.Parse(comment.GroupId);
+
+    var filter = Builders<Group>.Filter.Eq("_id", groupId) & Builders<Group>.Filter.ElemMatch(g => g.Expenses, e => e.Id == expenseId);
+    var updateExpense = Builders<Group>.Update.Push("Expenses.$.Comments", newComment);
+    try
+    {
+      await _groupCollection.FindOneAndUpdateAsync(filter, updateExpense);
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex.Message);
+    }
+  }
+
   public async Task AddNewTransfer(NewTransferDto newTransferDto)
   {
     var newTransfer = _mapper.Map<Transfer>(newTransferDto);

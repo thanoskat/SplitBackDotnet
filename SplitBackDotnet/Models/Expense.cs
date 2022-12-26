@@ -16,5 +16,6 @@ public class Expense
   public Label? Label { get; set; }
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
   public string IsoCode { get; set; } = null!;
+  public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
   public ICollection<ExpenseSnapShot>? History { get; set; } = new List<ExpenseSnapShot>();
 }

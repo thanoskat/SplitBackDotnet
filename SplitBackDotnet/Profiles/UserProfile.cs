@@ -25,10 +25,11 @@ public class UserProfile : Profile
     CreateMap<NewExpenseDto, Expense>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.GenerateNewId()));
     CreateMap<EditExpenseDto, Expense>();
     CreateMap<NewTransferDto, Transfer>();
-    // .ForMember(dest => dest.Currency, opt => opt.Ignore());
+    //.ForMember(dest => dest.Currency, opt => opt.Ignore());
     CreateMap<CreateGroupDto, Group>();
     CreateMap<Expense, ExpenseSnapShot>()
-    .ForMember(dest => dest.Id, opt => opt.Ignore())
+    //.ForMember(dest => dest.Id, opt => opt.Ignore())
     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.GenerateNewId()));
+    CreateMap<NewCommentDto, Comment>().ForMember(dest=>dest.Id, opt => opt.MapFrom(src => ObjectId.GenerateNewId()));
   }
 }
