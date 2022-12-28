@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 namespace SplitBackDotnet.Dtos;
 
-public class NewTransferDto : ITransferDto
+public class EditTransferDto : ITransferDto
 {
+  public string TransferId { get; set; } = null!;
   public string GroupId { get; set; } = null!;
   [MaxLength(80)]
   public string? Description { get; set; }

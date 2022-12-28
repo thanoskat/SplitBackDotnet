@@ -2,7 +2,6 @@ using SplitBackDotnet.Models;
 using Microsoft.EntityFrameworkCore;
 using SplitBackDotnet.Dtos;
 using AutoMapper;
-using SplitBackDotnet.Extensions;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -93,19 +92,12 @@ public class MongoRepo : IRepo
     var updateExpenses = Builders<Group>.Update.AddToSet("Expenses", newExpense);
     await _groupCollection.FindOneAndUpdateAsync(group => group.Id == groupId, updateExpenses);
   }
-  public async Task AddExpenseToHistory(Group oldGroup, ObjectId expenseId, FilterDefinition<Group>? filter)
-  {
-    var oldExpense = oldGroup.Expenses.First(e => e.Id == expenseId);
-    var snapShot = _mapper.Map<ExpenseSnapShot>(oldExpense);
-    var updateExpense = Builders<Group>.Update.Push("Expenses.$.History", snapShot);
-    await _groupCollection.FindOneAndUpdateAsync(filter, updateExpense);
-  }
   public async Task EditExpense(EditExpenseDto editExpenseDto)
   {
     var newExpense = _mapper.Map<Expense>(editExpenseDto);
     var groupId = ObjectId.Parse(editExpenseDto.GroupId);
-    //var expenseId = ObjectId.Parse(editExpenseDto.ExpenseId);
-    var expenseId = ObjectId.Parse("63aa01d6fc5958282c420af2");
+    var expenseId = ObjectId.Parse(editExpenseDto.ExpenseId);
+    //var expenseId = ObjectId.Parse("63ac1e064b49cf6ddbf27738");
     var filter = Builders<Group>.Filter.Eq("_id", groupId) & Builders<Group>.Filter.ElemMatch(g => g.Expenses, e => e.Id == expenseId);
     var updateExpense = Builders<Group>.Update
            .Set("Expenses.$.Description", newExpense.Description)
@@ -121,7 +113,7 @@ public class MongoRepo : IRepo
     try
     {
       var oldGroup = await _groupCollection.FindOneAndUpdateAsync(filter, updateExpense);
-      await AddExpenseToHistory(oldGroup, expenseId, filter);
+      await AddToHistory(oldGroup, expenseId, filter, true);
     }
     catch (Exception ex)
     {
@@ -158,6 +150,93 @@ public class MongoRepo : IRepo
     var updateTransfers = Builders<Group>.Update.AddToSet("Transfers", newTransfer);
     await _groupCollection.FindOneAndUpdateAsync(group => group.Id == groupId, updateTransfers);
   }
+  public async Task AddToHistory(Group oldGroup, ObjectId OperationId, FilterDefinition<Group>? filter, bool isExpense)
+  {
+    if (isExpense)
+    {
+      var oldExpense = oldGroup.Expenses.First(e => e.Id == OperationId);
+      var snapShot = _mapper.Map<ExpensePastSnapShot>(oldExpense);
+      var update = Builders<Group>.Update.Push("Expenses.$.History", snapShot);
+      await _groupCollection.FindOneAndUpdateAsync(filter, update);
+    }
+    else
+    {
+      var oldTransfer = oldGroup.Transfers.First(t => t.Id == OperationId);
+      var snapShot = _mapper.Map<TransferPastSnapShot>(oldTransfer);
+      var update = Builders<Group>.Update.Push("Transfers.$.History", snapShot);
+      await _groupCollection.FindOneAndUpdateAsync(filter, update);
+    }
+  }
+
+  public async Task EditTransfer(EditTransferDto editTransferDto)
+  {
+    var newTransfer = _mapper.Map<Transfer>(editTransferDto);
+    var groupId = ObjectId.Parse(editTransferDto.GroupId);
+    var transferId = ObjectId.Parse(editTransferDto.TransferId);
+    //var transferId = ObjectId.Parse("63aafa3ad36b483e99735bcd");
+    var filter = Builders<Group>.Filter.Eq("_id", groupId) & Builders<Group>.Filter.ElemMatch(g => g.Transfers, t => t.Id == transferId);
+    var updateTransfer = Builders<Group>.Update
+           .Set("Transfers.$.Description", newTransfer.Description)
+           .Set("Transfers.$.Amount", newTransfer.Amount)
+           .Set("Transfers.$.SenderId", newTransfer.SenderId)
+           .Set("Transfers.$.ReceiverId", newTransfer.ReceiverId)
+           .Set("Transfers.$.IsoCode", newTransfer.IsoCode);
+    var client = new MongoClient(_connectionString);
+    using var session = await client.StartSessionAsync();
+    session.StartTransaction();
+    try
+    {
+      var oldGroup = await _groupCollection.FindOneAndUpdateAsync(filter, updateTransfer);
+      await AddToHistory(oldGroup, transferId, filter, false);
+    }
+    catch (Exception ex)
+    {
+      await session.AbortTransactionAsync();
+      Console.WriteLine(ex.Message);
+    }
+  }
+
+  public async Task RemoveExpense(RemoveExpenseDto removeExpenseDto)
+  {
+    var client = new MongoClient(_connectionString);
+    using var session = await client.StartSessionAsync();
+    session.StartTransaction();
+    try
+    {
+      var groupId = ObjectId.Parse(removeExpenseDto.GroupId);
+      var expenseId = ObjectId.Parse(removeExpenseDto.ExpenseId);
+      var filter = Builders<Group>.Filter.Eq("_id", groupId) & Builders<Group>.Filter.ElemMatch(g => g.Expenses, e => e.Id == expenseId);
+      var removeExpense = Builders<Group>.Update.Set("Expenses.$.IsDeleted", true);
+      var oldGroup = await _groupCollection.FindOneAndUpdateAsync(filter, removeExpense);
+      await AddToHistory(oldGroup, expenseId, filter, true);
+    }
+    catch (Exception ex)
+    {
+      await session.AbortTransactionAsync();
+      Console.WriteLine(ex.Message);
+    }
+  }
+
+  public async Task RemoveTransfer(RemoveTransferDto removeTransferDto)
+  {
+    var client = new MongoClient(_connectionString);
+    using var session = await client.StartSessionAsync();
+    session.StartTransaction();
+    try
+    {
+      var groupId = ObjectId.Parse(removeTransferDto.GroupId);
+      var transferId = ObjectId.Parse(removeTransferDto.TransferId);
+      var filter = Builders<Group>.Filter.Eq("_id", groupId) & Builders<Group>.Filter.ElemMatch(g => g.Transfers, e => e.Id == transferId);
+      var removeExpense = Builders<Group>.Update.Set("Transfers.$.IsDeleted", true);
+      var oldGroup = await _groupCollection.FindOneAndUpdateAsync(filter, removeExpense);
+      await AddToHistory(oldGroup, transferId, filter, false);
+    }
+    catch (Exception ex)
+    {
+      await session.AbortTransactionAsync();
+      Console.WriteLine(ex.Message);
+    }
+  }
 
   public async Task AddUserToGroup(ObjectId groupID, ObjectId userID)
   {
@@ -175,6 +254,7 @@ public class MongoRepo : IRepo
     }
     else throw new Exception();
   }
+
 
   public async Task CreateGroup(Group group)
   {
@@ -203,20 +283,5 @@ public class MongoRepo : IRepo
   }
 
 
-  public async Task RemoveExpense(RemoveExpenseDto removeExpenseDto)
-  {
-    var groupId = ObjectId.Parse(removeExpenseDto.GroupId);
-    var expenseId = ObjectId.Parse(removeExpenseDto.ExpenseId);
-    var removeExpense = Builders<Group>.Update.PullFilter(g => g.Expenses, e => e.Id == expenseId);
-    await _groupCollection.FindOneAndUpdateAsync(group => group.Id == groupId, removeExpense);
-  }
-
-  public async Task RemoveTransfer(RemoveTransferDto removeTransferDto)
-  {
-    var groupId = ObjectId.Parse(removeTransferDto.GroupId);
-    var transferId = ObjectId.Parse(removeTransferDto.TransferId);
-    var removeTransfer = Builders<Group>.Update.PullFilter(g => g.Transfers, t => t.Id == transferId);
-    await _groupCollection.FindOneAndUpdateAsync(group => group.Id == groupId, removeTransfer);
-  }
 
 }

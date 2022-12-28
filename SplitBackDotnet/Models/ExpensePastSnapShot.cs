@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 namespace SplitBackDotnet.Models;
 
-public class ExpenseSnapShot
+public class ExpensePastSnapShot
 {
   public ObjectId Id { get; set; }
   [MaxLength(100)]
@@ -16,4 +16,5 @@ public class ExpenseSnapShot
   public ICollection<Comment> Comments { get; set; } = new List<Comment>();
   public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
   public string IsoCode { get; set; } = null!;
+  public bool IsDeleted { get; set; }
 }

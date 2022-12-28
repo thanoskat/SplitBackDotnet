@@ -33,13 +33,39 @@ public static class TransferEndpoints
         return Results.BadRequest(ex.Message);
       }
     });
+
+    app.MapPost("/editTransfer", async (IRepo repo, EditTransferDto editTransferDto) =>
+    {
+      try
+      {
+        var groupId = ObjectId.Parse(editTransferDto.GroupId);
+        var transferValidator = new TransferValidator();
+        var validationResult = transferValidator.Validate(editTransferDto);
+        if (validationResult.Errors.Count > 0)
+        {
+          return Results.Ok(validationResult.Errors.Select(x => new
+          {
+            Message = x.ErrorMessage,
+            Field = x.PropertyName
+          }));
+        }
+        await repo.EditTransfer(editTransferDto);
+        var group = await repo.GetGroupById(groupId);
+        if (group is null) throw new Exception();
+        return Results.Ok(group.PendingTransactions());
+      }
+      catch (Exception ex)
+      {
+        return Results.BadRequest(ex.Message);
+      }
+    });
     
     app.MapPost("/removeTransfer", async (IRepo repo, RemoveTransferDto removeTransferDto) =>
     {var groupId = ObjectId.Parse(removeTransferDto.GroupId);
       try
-      {
-        var group = await repo.GetGroupById(groupId);
+      {//need a transaction here?
         await repo.RemoveTransfer(removeTransferDto);
+        var group = await repo.GetGroupById(groupId);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());
       }

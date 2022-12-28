@@ -84,11 +84,12 @@ public static class ExpenseEndpoints
 
     app.MapPost("/removeExpense", async (IRepo repo, RemoveExpenseDto removeExpenseDto) =>
     {
-      var groupId = ObjectId.Parse(removeExpenseDto.GroupId);
+      
       try
-      {
-        var group = await repo.GetGroupById(groupId);
+      {//need transaction?
+        var groupId = ObjectId.Parse(removeExpenseDto.GroupId);
         await repo.RemoveExpense(removeExpenseDto);
+        var group = await repo.GetGroupById(groupId);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());
       }

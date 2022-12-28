@@ -1,9 +1,8 @@
-﻿namespace SplitBackDotnet.Models;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
+namespace SplitBackDotnet.Models;
 
-
-public class Transfer
+public class TransferPastSnapShot
 {
   public ObjectId Id { get; set; }
   [MaxLength(80)]
@@ -12,7 +11,6 @@ public class Transfer
   public string IsoCode { get; set; } = null!;
   public ObjectId SenderId { get; set; }
   public ObjectId ReceiverId { get; set; }
-  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-  public ICollection<TransferPastSnapShot>? History { get; set; } = new List<TransferPastSnapShot>();
-  public bool IsDeleted { get; set; } = false;
+  public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
+  public bool IsDeleted { get; set; }
 }

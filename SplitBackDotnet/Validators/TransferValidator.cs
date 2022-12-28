@@ -4,7 +4,7 @@ using SplitBackDotnet.Extensions;
 using NMoneys;
 
 //Probably need to validate max length of amounts
-public class TransferValidator : AbstractValidator<NewTransferDto>
+public class TransferValidator : AbstractValidator<ITransferDto>
 {
   public TransferValidator()
   {

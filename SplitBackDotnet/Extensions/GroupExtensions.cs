@@ -34,7 +34,7 @@ public static class GroupExtensions
         participants.Add(new Participant(member, 0m, 0m));
       });
 
-      group.Expenses.Where(exp => exp.IsoCode == currentIsoCode).ToList().ForEach(expense =>
+      group.Expenses.Where(exp => exp.IsoCode == currentIsoCode && exp.IsDeleted == false).ToList().ForEach(expense =>
       {
         expense.ExpenseParticipants.ToList().ForEach(expenseParticipant =>
         {
@@ -47,7 +47,7 @@ public static class GroupExtensions
         });
       });
 
-      group.Transfers.Where(exp => exp.IsoCode == currentIsoCode).ToList().ForEach(transfer =>
+      group.Transfers.Where(tr => tr.IsoCode == currentIsoCode && tr.IsDeleted == false).ToList().ForEach(transfer =>
       {
 
         participants.Single(p => p.Id == transfer.ReceiverId).TotalAmountTaken += transfer.Amount;
@@ -150,7 +150,8 @@ public static class GroupExtensions
       {
         var transactionMemberDetail = expense.ToTransactionMemberDetailFromUserId(userId);
 
-        if (transactionMemberDetail is not null) {
+        if (transactionMemberDetail is not null)
+        {
           transactionMemberDetails.Add(transactionMemberDetail);
         }
       };
@@ -160,7 +161,8 @@ public static class GroupExtensions
       {
         var transactionMemberDetail = transfer.ToTransactionMemberDetailFromUserId(userId);
 
-        if (transactionMemberDetail is not null) {
+        if (transactionMemberDetail is not null)
+        {
           transactionMemberDetails.Add(transactionMemberDetail);
         }
       };

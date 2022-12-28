@@ -18,18 +18,39 @@ public class UserProfile : Profile
   {
     //source ->target
     CreateMap<UserCreateDto, User>();
-
     CreateMap<LabelDto, Label>();
-    CreateMap<ExpenseParticipantDto, ExpenseParticipant>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ParticipantId));
-    CreateMap<ExpenseSpenderDto, ExpenseSpender>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.SpenderId));
-    CreateMap<NewExpenseDto, Expense>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.GenerateNewId()));
+
+    CreateMap<ExpenseParticipantDto, ExpenseParticipant>()
+    .ForMember(dest => dest.Id, opt => opt
+    .MapFrom(src => src.ParticipantId));
+
+    CreateMap<ExpenseSpenderDto, ExpenseSpender>()
+    .ForMember(dest => dest.Id, opt => opt
+    .MapFrom(src => src.SpenderId));
+
+    CreateMap<NewExpenseDto, Expense>()
+    .ForMember(dest => dest.Id, opt => opt
+    .MapFrom(src => ObjectId.GenerateNewId()));
+
+    CreateMap<NewTransferDto, Transfer>()
+    .ForMember(dest => dest.Id, opt => opt
+    .MapFrom(src => ObjectId.GenerateNewId()));
+
     CreateMap<EditExpenseDto, Expense>();
-    CreateMap<NewTransferDto, Transfer>();
-    //.ForMember(dest => dest.Currency, opt => opt.Ignore());
+    CreateMap<EditTransferDto, Transfer>();
     CreateMap<CreateGroupDto, Group>();
-    CreateMap<Expense, ExpenseSnapShot>()
-    //.ForMember(dest => dest.Id, opt => opt.Ignore())
-    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => ObjectId.GenerateNewId()));
-    CreateMap<NewCommentDto, Comment>().ForMember(dest=>dest.Id, opt => opt.MapFrom(src => ObjectId.GenerateNewId()));
+
+    CreateMap<Expense, ExpensePastSnapShot>()
+    .ForMember(dest => dest.Id, opt => opt
+    .MapFrom(src => ObjectId.GenerateNewId()));
+
+    CreateMap<Transfer, TransferPastSnapShot>()
+    .ForMember(dest => dest.Id, opt => opt
+    .MapFrom(src => ObjectId.GenerateNewId()));
+
+    CreateMap<NewCommentDto, Comment>()
+    .ForMember(dest => dest.Id, opt => opt
+    .MapFrom(src => ObjectId.GenerateNewId()));
   }
 }
+//.ForMember(dest => dest.Id, opt => opt.Ignore())

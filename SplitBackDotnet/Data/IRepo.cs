@@ -1,13 +1,16 @@
 using SplitBackDotnet.Models;
 using SplitBackDotnet.Dtos;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace SplitBackDotnet.Data;
 public interface IRepo
 {
   Task CreateGroup(Group group);
+
+  Task AddComment(NewCommentDto newComment, ObjectId userId);
   
-  Task AddComment (NewCommentDto newComment, ObjectId userId);
+  Task AddToHistory(Group oldGroup, ObjectId Id, FilterDefinition<Group>? filter, bool isExpense);
 
   Task AddLabel(Label label);
 
@@ -17,9 +20,11 @@ public interface IRepo
 
   Task RemoveExpense(RemoveExpenseDto removeExpenseDto);
 
-  Task RemoveTransfer(RemoveTransferDto removeTransferDto);
-
   Task AddNewTransfer(NewTransferDto newTransferDto);
+
+  Task EditTransfer(EditTransferDto editTransferDto);
+
+  Task RemoveTransfer(RemoveTransferDto removeTransferDto);
 
   Task<Group?> GetGroupById(ObjectId groupId);
 
