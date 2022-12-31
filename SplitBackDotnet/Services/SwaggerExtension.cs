@@ -22,7 +22,7 @@ public static class SwaggerExtension {
             Id = "Bearer"
           }
         },
-        new string[] {}
+        Array.Empty<string>()
       }
     };
 
