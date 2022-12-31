@@ -1,4 +1,5 @@
 namespace SplitBackDotnet.Models;
+
 public class AlphaSplitDatabaseSettings
 {
   public string ConnectionString { get; set; } = null!;
@@ -8,5 +9,6 @@ public class AlphaSplitDatabaseSettings
   public string UserCollection { get; set; } = null!;
   public string InvitationCollection { get; set; } = null!;
   public string SessionCollection { get; set; } = null!;
+  public string ActionCollection { get; set; } = null!;
 
 }

@@ -49,5 +49,10 @@ public static class GroupEndpoints
         return Results.BadRequest(ex.Message);
       }
     });
+    
+    app.MapPost("/test", async (IRepo repo) =>
+    {
+      await repo.Test();
+    });
   }
 }

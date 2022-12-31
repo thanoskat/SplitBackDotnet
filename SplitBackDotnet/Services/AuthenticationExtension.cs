@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -9,8 +10,8 @@ public static class AuthenticationExtension {
   public static void AddMyAuthentication(this IServiceCollection services, IConfiguration config) {
 
     services.AddAuthentication(options => {
-      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-      options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+      // options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+      // options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
       options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     }).AddJwtBearer(options => {
       options.TokenValidationParameters = new TokenValidationParameters {
@@ -19,13 +20,19 @@ public static class AuthenticationExtension {
         ValidAudience = config["Jwt:Audience"],
         ValidateAudience = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
-        ValidateLifetime = true, // In any other application other then dem o this needs to be true,
+        ValidateLifetime = true, 
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero
       };
     });
-    Console.WriteLine(config["Jwt:Key"]);
-    services.AddAuthentication();
-    services.AddAuthorization();
+    // services.AddAuthentication();
+    // services.AddAuthorization();
+    services.AddAuthorization(options =>
+    {
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+          .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+          .RequireAuthenticatedUser()
+          .Build();
+    });
   }
 }

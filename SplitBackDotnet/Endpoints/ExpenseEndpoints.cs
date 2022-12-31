@@ -73,6 +73,7 @@ public static class ExpenseEndpoints
         var group = await repo.GetGroupById(removeExpenseDto.GroupId.ToInt());
         await repo.RemoveExpense(removeExpenseDto);
         if (group is null) throw new Exception();
+        
         return Results.Ok(group.PendingTransactions());
       }
       catch (Exception ex)

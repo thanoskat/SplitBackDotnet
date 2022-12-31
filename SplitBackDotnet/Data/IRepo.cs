@@ -5,6 +5,8 @@ namespace SplitBackDotnet.Data;
 
 public interface IRepo
 {
+  Task Test();
+  
   Task CreateGroup(Group group);
 
   Task AddLabel(Label label);
