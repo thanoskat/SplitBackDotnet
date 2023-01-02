@@ -18,5 +18,5 @@ public class Expense
   public Label? Label { get; set; }
   public DateTime CreatedAt { get; set; }
   public string IsoCode { get; set; }
-
+  
 }
