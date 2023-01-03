@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace SplitBackDotnet.Models;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+
 
 public class Group
 {
   public ObjectId Id { get; set; }
-
   [MaxLength(50)]
   [Required]
   public string Title { get; set; } = String.Empty;
@@ -18,4 +17,6 @@ public class Group
   public ICollection<Label> GroupLabels { get; set; } = new List<Label>();
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
   public string BaseCurrencyIsoCode { get; set; } = null!;
+  public bool isArchived { get; set; } = false;
+  public bool isDeleted { get; set; } = false;
 }

@@ -60,11 +60,11 @@ public static class TransferEndpoints
       }
     });
     
-    app.MapPost("/removeTransfer", async (IRepo repo, RemoveTransferDto removeTransferDto) =>
-    {var groupId = ObjectId.Parse(removeTransferDto.GroupId);
+    app.MapPost("/removeOrRestoreTransfer", async (IRepo repo, RemoveRestoreTransferDto removeRestoreTransferDto) =>
+    {var groupId = ObjectId.Parse(removeRestoreTransferDto.GroupId);
       try
       {//need a transaction here?
-        await repo.RemoveTransfer(removeTransferDto);
+        await repo.RemoveOrRestoreTransfer(removeRestoreTransferDto);
         var group = await repo.GetGroupById(groupId);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());

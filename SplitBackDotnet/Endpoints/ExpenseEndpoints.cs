@@ -82,13 +82,12 @@ public static class ExpenseEndpoints
          }
        });
 
-    app.MapPost("/removeExpense", async (IRepo repo, RemoveExpenseDto removeExpenseDto) =>
+    app.MapPost("/removeOrRestoreExpense", async (IRepo repo, RemoveRestoreExpenseDto removeRestoreExpenseDto) =>
     {
-      
       try
       {//need transaction?
-        var groupId = ObjectId.Parse(removeExpenseDto.GroupId);
-        await repo.RemoveExpense(removeExpenseDto);
+        var groupId = ObjectId.Parse(removeRestoreExpenseDto.GroupId);
+        await repo.RemoveOrRestoreExpense(removeRestoreExpenseDto);
         var group = await repo.GetGroupById(groupId);
         if (group is null) throw new Exception();
         return Results.Ok(group.PendingTransactions());

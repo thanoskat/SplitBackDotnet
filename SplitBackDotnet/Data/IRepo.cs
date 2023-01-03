@@ -9,7 +9,7 @@ public interface IRepo
   Task CreateGroup(Group group);
 
   Task AddComment(NewCommentDto newComment, ObjectId userId);
-  
+
   Task AddToHistory(Group oldGroup, ObjectId Id, FilterDefinition<Group>? filter, bool isExpense);
 
   Task AddLabel(Label label);
@@ -18,13 +18,13 @@ public interface IRepo
 
   Task EditExpense(EditExpenseDto editExpenseDto);
 
-  Task RemoveExpense(RemoveExpenseDto removeExpenseDto);
+  Task RemoveOrRestoreExpense(RemoveRestoreExpenseDto removeRestoreExpenseDto);
 
   Task AddNewTransfer(NewTransferDto newTransferDto);
 
   Task EditTransfer(EditTransferDto editTransferDto);
 
-  Task RemoveTransfer(RemoveTransferDto removeTransferDto);
+  Task RemoveOrRestoreTransfer(RemoveRestoreTransferDto removeRestoreTransferDto);
 
   Task<Group?> GetGroupById(ObjectId groupId);
 
@@ -42,6 +42,22 @@ public interface IRepo
 
   Task<Session> GetSessionByRefreshToken(string refreshToken);
 
-  Task AddUserToGroup(ObjectId groupID, ObjectId UserID);
+  Task AddUserToGroup(ObjectId groupId, ObjectId UserId);
+
+  Task CreateInvitation(ObjectId inviterId, ObjectId groupId);
+
+  Task<Invitation> GetInvitationByInviter(ObjectId userId, ObjectId groupId);
+
+  Task<Invitation> GetInvitationByCode(string Code);
+
+  Task<DeleteResult> DeleteInvitation(ObjectId userId, ObjectId groupId);
+
+  Task<Group> CheckIfUserInGroupMembers(ObjectId userId, ObjectId groupId);
+
+  Task<Group> CheckAndAddUserInGroupMembers(ObjectId userId, ObjectId groupId);
+
+  Task<User> CheckIfGroupInUser(ObjectId userId, ObjectId groupId);
+
+  Task<User> CheckAndAddGroupInUser(ObjectId userId, ObjectId groupId);
 
 }

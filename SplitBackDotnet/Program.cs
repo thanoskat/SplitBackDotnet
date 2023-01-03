@@ -66,6 +66,7 @@ app.MapExpenseEndpoints();
 app.MapTransferEndpoints();
 app.MapGroupEndpoints();
 app.MapAuthenticationEndpoints();
+app.MapInvitationEndpoints();
 
 app.UseCors("AllowAllPolicy");
 

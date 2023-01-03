@@ -6,7 +6,7 @@ using MongoDB.Bson.Serialization.Attributes;
 public class User
 {
 
-  [BsonRepresentation(BsonType.ObjectId)]
+  //[BsonRepresentation(BsonType.ObjectId)]
   public ObjectId Id { get; set; }
 
   [MaxLength(200)]
